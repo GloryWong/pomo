@@ -74,7 +74,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent } from 'vue'
+  import { defineComponent, watch } from 'vue'
   export default defineComponent({
     name: 'DialPlate',
   })
@@ -89,6 +89,7 @@
   } from './timeRange'
   import { initPointerPlateInfo } from './pointerPlate'
   import Timer from './timer'
+  import * as Tone from 'tone'
 
   let dialPlateSize = Math.min(window.innerWidth, window.innerHeight) * 0.8
   let MAX_SIZE = 570
@@ -170,7 +171,6 @@
   const paddedTime = computed(() => formatMinute(time.value))
   const timer = new Timer({
     stepCallbacks: () => {
-      // console.log('timer')
       pointerPlateInfo.angle = _angle.value = _angle.value - secondToAngle(1)
     },
   })
@@ -229,4 +229,13 @@
 
     _angle.value = angle
   }
+
+  /// sounds ///
+  const synth = new Tone.Synth().toDestination()
+  watch(_angle, (value) => {
+    const note = pointerPlateInfo.active
+      ? `C${Math.floor(angleToMinute(value) / 10) + 2}`
+      : 'A2'
+    synth.triggerAttackRelease(note, '32n')
+  })
 </script>

@@ -86,7 +86,7 @@ export default class Timer {
       }
 
       this.count += this.step * (this.asc ? 1 : -1)
-      console.log(this.count)
+      // console.log(this.count)
       this.invokeCallbacks(this.stepCallbacks)
     }, this.stepDuration * 1000)
 
