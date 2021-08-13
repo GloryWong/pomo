@@ -17,8 +17,8 @@
         :key="time"
         class="absolute top-0 left-1/2 w-1/100 flex justify-center"
         :class="[
-          `h-${primary ? '1/20' : '1/24'}`,
-          `bg-gray-${angle === _angle ? '300' : '200'}`,
+          `${primary ? 'h-1/20' : 'h-1/24'}`,
+          `${angle === _angle ? 'bg-gray-300' : 'bg-gray-200'}`,
         ]"
         :style="[
           `transform-origin: center ${timeRangeInfo.radius}px`,
