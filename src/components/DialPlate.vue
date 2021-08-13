@@ -20,7 +20,10 @@
           `h-${primary ? '1/20' : '1/24'}`,
           `bg-gray-${angle === _angle ? '300' : '200'}`,
         ]"
-        :style="`transform-origin: center ${timeRangeInfo.radius}px; transform: translateX(-50%) rotate(${angle}deg);`"
+        :style="[
+          `transform-origin: center ${timeRangeInfo.radius}px`,
+          `transform: translateX(-50%) rotate(${angle}deg)`,
+        ]"
       >
         <div
           class="flex justify-center absolute -bottom-6"
