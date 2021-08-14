@@ -107,7 +107,7 @@
       </div>
     </div>
     <div
-      class="mask absolute w-full h-full rounded-full"
+      class="mask absolute w-full h-full rounded-full cursor-pointer"
       @mousedown.prevent="mousedownHandler"
       @mousemove.prevent="mousemoveHandler"
       @mouseup.prevent="mouseupHandler"
