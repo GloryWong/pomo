@@ -2,23 +2,40 @@
   <div
     class="
       dial-plate
-      bg-gray-50
+      bg-primary-light
       rounded-full
       mx-auto
       my-auto
       overflow-hidden
       relative
+      bg-tomato-radial-gradient
     "
     :style="`width: ${dialPlateSize}px; height: ${dialPlateSize}px;`"
   >
-    <div ref="timeRange" class="time-range absolute w-full h-full rounded-full">
+    <div
+      ref="timeRange"
+      class="
+        time-range
+        absolute
+        w-5/6
+        h-5/6
+        rounded-full
+        absolute
+        top-0
+        right-0
+        bottom-0
+        left-0
+        m-auto
+      "
+    >
       <div
         v-for="{ time, angle, primary, timeVisible } in timeRangeInfo.points"
         :key="time"
         class="absolute top-0 left-1/2 w-1/100 flex justify-center"
         :class="[
-          `${primary ? 'h-1/20' : 'h-1/24'}`,
-          `${angle === _angle ? 'bg-gray-300' : 'bg-gray-200'}`,
+          `${primary ? 'w-1/100' : 'w-1/200'}`,
+          `${primary ? 'h-1/24' : 'h-1/48'}`,
+          `${angle === _angle ? 'bg-neutral' : 'bg-neutral-lighter'}`,
         ]"
         :style="[
           `transform-origin: center ${timeRangeInfo.radius}px`,
@@ -26,7 +43,15 @@
         ]"
       >
         <div
-          class="flex justify-center absolute -bottom-6"
+          class="
+            flex
+            justify-center
+            absolute
+            -top-9
+            text-neutral-lighter
+            font-black
+            text-2xl
+          "
           :style="`transform: rotate(${-angle}deg)`"
         >
           {{ timeVisible ? time : '' }}
@@ -37,9 +62,8 @@
       ref="pointerPlate"
       class="
         pointer-plate
-        bg-gray-100
-        w-3/4
-        h-3/4
+        w-2/3
+        h-2/3
         rounded-full
         absolute
         top-0
@@ -50,13 +74,29 @@
         flex
         justify-center
         items-center
+        border-2 border-gray-900 border-opacity-10
+        shadow-tomato-line
       "
     >
       <div
-        class="pointer w-1/100 h-1/12 bg-yellow-500 absolute top-0 left-1/2"
+        class="
+          pointer
+          w-0
+          h-0
+          border-8
+          border-b-15
+          border-t-10
+          border-neutral-lighter
+          border-l-transparent
+          border-r-transparent
+          border-t-transparent
+          absolute
+          top-0
+          left-1/2
+        "
         :style="`transform-origin: center ${pointerPlateInfo.radius}px; transform: translateX(-50%) rotate(${_angle}deg)`"
       ></div>
-      <div class="time-box text-3xl text-gray-400">
+      <div class="time-box text-3xl text-neutral-light">
         {{ paddedTime.minutes }} : {{ paddedTime.seconds }}
       </div>
     </div>
@@ -74,14 +114,14 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, watch } from 'vue'
+  import { defineComponent } from 'vue'
   export default defineComponent({
     name: 'DialPlate',
   })
 </script>
 
 <script lang="ts" setup>
-  import { onMounted, ref, reactive, computed } from 'vue'
+  import { onMounted, ref, watch, reactive, computed } from 'vue'
   import {
     initTimeRangeInfo,
     calculateMouseOffsetAngleToCenter,
