@@ -51,6 +51,8 @@ module.exports = {
       backgroundImage: {
         'tomato-radial-gradient': `
         radial-gradient(circle, transparent 20%, rgba(0,0,0,0.1) 70%, transparent 80%, transparent)`,
+        'tomato-pointer-plate-radial-gradient': `
+        radial-gradient(circle, rgba(0,0,0,0.05) 10%, transparent 30%, rgba(0,0,0,0.05) 90%)`,
       },
     },
   },
