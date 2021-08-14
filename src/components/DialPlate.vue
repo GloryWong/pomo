@@ -28,7 +28,7 @@
         m-auto
       "
       :style="{
-        transform: `rotate(${_angle}deg`,
+        transform: `rotate(${getAngleOnFly()}deg`,
       }"
     >
       <div
@@ -38,7 +38,7 @@
         :class="[
           `${primary ? 'w-1/100' : 'w-1/200'}`,
           `${primary ? 'h-1/24' : 'h-1/48'}`,
-          `${angle === _angle ? 'bg-neutral' : 'bg-neutral-lighter'}`,
+          `${angle === getAngleOnFly() ? 'bg-neutral' : 'bg-neutral-lighter'}`,
         ]"
         :style="[
           `transform-origin: center ${timeRangeInfo.radius}px`,
@@ -57,7 +57,7 @@
             text-lg
             sm:text-2xl
           "
-          :style="`transform: rotate(${angle - _angle}deg)`"
+          :style="`transform: rotate(${angle - getAngleOnFly()}deg)`"
         >
           {{ timeVisible ? time : '' }}
         </div>
@@ -119,207 +119,64 @@
   </div>
 </template>
 
-<script lang="ts">
-  import { defineComponent } from 'vue'
-  export default defineComponent({
-    name: 'DialPlate',
-  })
-</script>
-
 <script lang="ts" setup>
-  import { onMounted, ref, watch, reactive, computed } from 'vue'
+  import { onMounted } from 'vue'
   import {
-    initTimeRangeInfo,
+    useDialPlate,
+    useTimer,
+    usePointerPlate,
+    useTimeRange,
+    useSound,
+    useRotate,
+    useEventHandler,
+  } from '../composables'
+
+  const { dialPlateSize, getAngleOnFly, setAngleOnFly } = useDialPlate()
+  const { pointerPlate, pointerPlateInfo } = usePointerPlate()
+  const {
+    timeRange,
+    timeRangeInfo,
     calculateMouseOffsetAngleToCenter,
-    ClientPos,
-  } from './timeRange'
-  import { initPointerPlateInfo } from './pointerPlate'
-  import Timer from './timer'
-  import * as Tone from 'tone'
-
-  let dialPlateSize = Math.min(window.innerWidth, window.innerHeight) * 0.9
-  let MAX_SIZE = 600
-  dialPlateSize = Math.min(dialPlateSize, MAX_SIZE)
-
-  const timeRange = ref<unknown>(null)
-  const timeRangeInfo = reactive({
-    points: [] as any[],
-    pointRange: {
-      min: 0,
-      max: 60,
-    },
-    radius: 0,
-    pointOffsetAngle: 0,
-    maxRotation: 0,
-    angle: 0,
+    setPointerAngle,
+  } = useTimeRange({
+    setAngleOnFly,
+  })
+  const { timer } = useTimer({
+    timeRangeInfo,
+    getAngleOnFly,
+    setAngleOnFly,
   })
 
-  const pointerPlate = ref<unknown>(null)
-  const pointerPlateInfo = reactive({
-    active: false,
-    radius: 0,
+  const { readyRotate, rotate, stopRotate, paddedTime, time } = useRotate({
+    getAngleOnFly,
+    timeRangeInfo,
+    timer,
+    timeRange,
+    calculateMouseOffsetAngleToCenter,
+    setPointerAngle,
+    pointerPlateInfo,
+  })
+
+  const {
+    mousedownHandler,
+    mousemoveHandler,
+    mouseupHandler,
+    mouseoutHandler,
+    touchstartHandler,
+    touchmoveHandler,
+    touchendHandler,
+  } = useEventHandler({
+    readyRotate,
+    rotate,
+    stopRotate,
+  })
+
+  useSound({
+    time,
+    pointerPlateInfo,
   })
 
   onMounted(() => {
-    initTimeRangeInfo(timeRange.value as Element, timeRangeInfo)
-    initPointerPlateInfo(pointerPlate.value as Element, pointerPlateInfo)
-  })
-
-  ///// event handlers
-
-  const mousedownHandler = (event: MouseEvent): void => {
-    readyRotate({
-      clientX: event.clientX,
-      clientY: event.clientY,
-    })
-  }
-
-  const mousemoveHandler = (event: MouseEvent): void => {
-    rotate({
-      clientX: event.clientX,
-      clientY: event.clientY,
-    })
-  }
-
-  const mouseupHandler = (event: MouseEvent): void => {
-    stopRotate()
-  }
-  const mouseoutHandler = mouseupHandler
-
-  const touchstartHandler = (event: TouchEvent): void => {
-    const touch = event.targetTouches[0]
-    readyRotate({
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-    })
-  }
-
-  const touchmoveHandler = (event: TouchEvent): void => {
-    const touch = event.targetTouches[0]
-    rotate({
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-    })
-  }
-
-  const touchendHandler = (event: TouchEvent): void => {
-    stopRotate()
-  }
-  const touchcancelHandler = touchendHandler
-
-  ///// methods
-
-  import { roundAngle, formatMinute } from '../shared/util'
-  let _startAngle = 0
-  let _angle = ref(timeRangeInfo.angle)
-  let _rotation = 0
-  const time = computed(() => angleToMinute(_angle.value))
-  const paddedTime = computed(() => formatMinute(time.value))
-  const timer = new Timer({
-    stepCallbacks: () => {
-      timeRangeInfo.angle = _angle.value = _angle.value - secondToAngle(1)
-    },
-  })
-
-  function angleToMinute(angle: number): number {
-    return angle / timeRangeInfo.pointOffsetAngle
-  }
-
-  function secondToAngle(second: number): number {
-    return (timeRangeInfo.pointOffsetAngle / 60) * second
-  }
-
-  function readyRotate(clientPos: ClientPos): void {
-    timer.pause()
-    _startAngle = calculateMouseOffsetAngleToCenter(
-      clientPos,
-      timeRange.value as Element
-    )
-    pointerPlateInfo.active = true
-  }
-
-  function rotate(clientPos: ClientPos): void {
-    if (!pointerPlateInfo.active) {
-      return
-    }
-
-    const currentAngle = calculateMouseOffsetAngleToCenter(
-      clientPos,
-      timeRange.value as Element
-    )
-
-    _rotation = currentAngle - _startAngle
-    _rotation < 0 && (_rotation += 360)
-
-    setPointerAngle(_rotation)
-  }
-
-  function stopRotate(): void {
-    timeRangeInfo.angle = _angle.value
-    pointerPlateInfo.active = false
-    startTimer(angleToMinute(_angle.value))
-  }
-
-  /// Timer ///
-
-  function startTimer(time: number) {
-    timer.setRange(0, time * 60).start()
-  }
-
-  function setPointerAngle(angleChange: number) {
-    let angle = roundAngle(
-      timeRangeInfo.angle + angleChange,
-      timeRangeInfo.pointOffsetAngle
-    )
-    angle > 360 && (angle -= 360)
-
-    _angle.value = angle
-  }
-
-  /// sounds ///
-  const synth = new Tone.Synth().toDestination()
-  const synthEnd = new Tone.Synth().toDestination()
-  watch(time, (value) => {
-    try {
-      let note: string
-      console.log(value)
-      if (value === 0) {
-        return
-      }
-
-      if (value < 0.016) {
-        playEndSound()
-      } else {
-        note = pointerPlateInfo.active
-          ? 'B2'
-          : value > 5
-          ? 'C2'
-          : `C${7 - Math.floor(value)}`
-
-        synth.triggerAttackRelease(note, '32n')
-      }
-
-      function playEndSound() {
-        let count = 3
-        const id = setInterval(() => {
-          if (count-- === 0) {
-            clearInterval(id)
-            return
-          }
-          playHintSound()
-        }, 2000)
-      }
-
-      function playHintSound() {
-        console.count()
-
-        const now = Tone.now()
-        synthEnd.triggerAttackRelease('C4', '8n', now)
-        synthEnd.triggerAttackRelease('E4', '8n', now + 0.5)
-        synthEnd.triggerAttackRelease('G4', '8n', now + 1)
-      }
-    } catch (error) {
-      console.warn('Failed to play sound:', error)
-    }
+    setAngleOnFly(timeRangeInfo.angle)
   })
 </script>

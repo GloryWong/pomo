@@ -21,3 +21,11 @@ export function formatMinute(minute: number): {
     seconds: pad(seconds, 2),
   }
 }
+
+export function angleToMinute(angle: number, unit: number): number {
+  return angle / unit
+}
+
+export function secondToAngle(second: number, unit: number): number {
+  return (unit / 60) * second
+}

@@ -4,8 +4,10 @@ import './index.css'
 import { registerSW } from 'virtual:pwa-register'
 
 const updateSW = registerSW({
-  onNeedRefresh() {},
-  // onOfflineReady() {},
+  // onNeedRefresh() {},
+  onOfflineReady() {
+    confirm('Ready to work offline?')
+  },
   onRegisterError() {},
 })
 
