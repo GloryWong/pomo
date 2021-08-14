@@ -284,7 +284,6 @@
       let note: string
       console.log(value)
       if (value === 0) {
-        playEndSound()
         return
       }
 
