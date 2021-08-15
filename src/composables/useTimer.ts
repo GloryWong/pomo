@@ -1,7 +1,8 @@
 import Timer from '../shared/timer'
 import { secondToAngle } from '../shared/util'
+import { watch } from 'vue'
 
-export function useTimer({ timeRangeData }: any) {
+export function useTimer({ timeRangeData, state, stateOperations }: any) {
   const timer = new Timer({
     stepCallbacks: () => {
       timeRangeData.angle =
@@ -10,5 +11,14 @@ export function useTimer({ timeRangeData }: any) {
     },
   })
 
-  return { timer }
+  watch(state, () => {
+    if (stateOperations.isPaused()) {
+      timer.pause()
+      return
+    }
+
+    if (stateOperations.isRunning()) {
+      timer.setRange(0, timeRangeData.pointOnFly * 60).start()
+    }
+  })
 }

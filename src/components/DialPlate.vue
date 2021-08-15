@@ -102,6 +102,7 @@
         flex
         justify-center
         items-center
+        flex-col
         border-2 border-gray-900 border-opacity-10
         shadow-tomato-line
         bg-tomato-pointer-plate-radial-gradient
@@ -125,10 +126,60 @@
         "
         :style="`transform-origin: center ${pointerPlateData.radius}px; transform: translateX(-50%)`"
       ></div>
-      <div class="time-box text-neutral-light text-4xl sm:text-5xl">
-        {{ timeRangeData.paddedTime.minutes }} :
-        {{ timeRangeData.paddedTime.seconds }}
-      </div>
+      <transition
+        enter-from-class="opacity-0 translate-y-0"
+        enter-to-class="opacity-1 -translate-y-2"
+        leave-from-class="opacity-1 -translate-y-2"
+        leave-to-class="opacity-0 translate-y-0"
+      >
+        <div
+          class="
+            time-text
+            text-neutral-light text-4xl
+            sm:text-5xl
+            select-none
+            transition
+            duration-500
+          "
+          v-show="!stateOperations.isPaused()"
+        >
+          {{ pointerPlateData.timeText }}
+        </div>
+      </transition>
+      <transition
+        enter-from-class="opacity-0 translate-y-2"
+        enter-to-class="opacity-1 translate-y-0"
+        leave-from-class="opacity-1 translate-y-0"
+        leave-to-class="opacity-0 translate-y-2"
+      >
+        <div
+          class="
+            state-text
+            text-neutral-light text-4xl
+            sm:text-5xl
+            select-none
+            transition
+            duration-500
+          "
+          v-show="stateOperations.isPaused()"
+        >
+          {{ pointerPlateData.stateText }}
+        </div>
+      </transition>
+      <div
+        class="
+          mask
+          absolute
+          rounded-full
+          w-full
+          h-full
+          flex
+          justify-center
+          items-center
+          cursor-pointer
+        "
+        @dblclick.prevent="dblclickHandler"
+      ></div>
     </div>
   </div>
 </template>
@@ -147,12 +198,15 @@
   } from '../composables'
 
   const { winResizeObserver } = useWinResizeObserver()
-  const { size: dialPlateSize } = useDialPlate({
+
+  const {
+    size: dialPlateSize,
+    state,
+    stateOperations,
+  } = useDialPlate({
     winResizeObserver,
   })
-  const { pointerPlate, data: pointerPlateData } = usePointerPlate({
-    winResizeObserver,
-  })
+
   const {
     timeRange,
     data: timeRangeData,
@@ -162,8 +216,18 @@
   } = useTimeRange({
     winResizeObserver,
   })
-  const { timer } = useTimer({
+
+  const { pointerPlate, data: pointerPlateData } = usePointerPlate({
+    winResizeObserver,
+    state,
+    stateOperations,
     timeRangeData,
+  })
+
+  useTimer({
+    timeRangeData,
+    state,
+    stateOperations,
   })
 
   const { readyRotate, rotate, stopRotate, rotating } = useRotate({
@@ -178,17 +242,19 @@
     mousemoveHandler,
     mouseupHandler,
     mouseoutHandler,
+    dblclickHandler,
     touchstartHandler,
     touchmoveHandler,
     touchendHandler,
   } = useEventHandler({
-    timer,
     landAngleOnFly,
     timeRangeData,
     pointerPlateData,
     readyRotate,
     rotate,
     stopRotate,
+    state,
+    stateOperations,
   })
 
   useSound({

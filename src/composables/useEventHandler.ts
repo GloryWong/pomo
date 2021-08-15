@@ -1,24 +1,30 @@
 import { ClientPos } from '.'
+import { State } from '.'
 
 export function useEventHandler({
-  timer,
   landAngleOnFly,
-  timeRangeData,
   readyRotate,
   rotate,
   stopRotate,
+  state,
+  stateOperations,
 }: any) {
+  let prevState: State
+
   const _readyRotate = (clientPos: ClientPos) => {
     readyRotate(clientPos, () => {
-      timer.pause()
+      prevState = state.value
+      stateOperations.pause()
     })
   }
 
   const _stopRotate = () => {
     stopRotate(() => {
       landAngleOnFly()
-      // Start timer
-      timer.setRange(0, timeRangeData.pointOnFly * 60).start()
+
+      if (!stateOperations.isPaused(prevState)) {
+        stateOperations.run()
+      }
     })
   }
 
@@ -40,6 +46,12 @@ export function useEventHandler({
     _stopRotate()
   }
   const mouseoutHandler = mouseupHandler
+
+  const dblclickHandler = (): void => {
+    stateOperations.isRunning()
+      ? stateOperations.pause()
+      : stateOperations.run()
+  }
 
   const touchstartHandler = (event: TouchEvent): void => {
     const touch = event.targetTouches[0]
@@ -67,6 +79,7 @@ export function useEventHandler({
     mousemoveHandler,
     mouseupHandler,
     mouseoutHandler,
+    dblclickHandler,
     touchstartHandler,
     touchmoveHandler,
     touchendHandler,

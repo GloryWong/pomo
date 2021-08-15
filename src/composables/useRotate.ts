@@ -26,6 +26,10 @@ export function useRotate({ getAngleToTimeRangeCenter, moveAngleOnFly }: any) {
   }
 
   function stopRotate(callback: Function): void {
+    if (!rotating.value) {
+      return
+    }
+
     rotating.value = false
     callback()
   }
