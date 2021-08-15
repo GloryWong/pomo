@@ -1,12 +1,12 @@
 import Timer from '../shared/timer'
 import { secondToAngle } from '../shared/util'
 
-export function useTimer({ timeRangeInfo, getAngleOnFly, setAngleOnFly }: any) {
+export function useTimer({ timeRangeData }: any) {
   const timer = new Timer({
     stepCallbacks: () => {
-      timeRangeInfo.angle =
-        getAngleOnFly() - secondToAngle(1, timeRangeInfo.pointOffsetAngle)
-      setAngleOnFly(timeRangeInfo.angle)
+      timeRangeData.angle =
+        timeRangeData.angleOnFly - secondToAngle(1, timeRangeData.unitAngle)
+      timeRangeData.angleOnFly = timeRangeData.angle
     },
   })
 

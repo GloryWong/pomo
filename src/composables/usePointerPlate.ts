@@ -1,23 +1,22 @@
 import { ref, reactive, onMounted } from 'vue'
 
-export function usePointerPlate() {
+export function usePointerPlate({ winResizeObserver }: any) {
   const pointerPlate = ref<unknown>(null)
-  const pointerPlateInfo = reactive({
-    active: false,
+  const data = reactive({
+    size: 0,
     radius: 0,
   })
 
-  const initPointerPlateInfo = ($pp: Element, pointerPlateInfo: any) => {
-    const { width } = $pp.getBoundingClientRect()
-    pointerPlateInfo.radius = width / 2
-  }
-
   onMounted(() => {
-    initPointerPlateInfo(pointerPlate.value as Element, pointerPlateInfo)
+    winResizeObserver.register(() => {
+      const { width } = (pointerPlate.value as Element).getBoundingClientRect()
+      data.size = width
+      data.radius = width / 2
+    })
   })
 
   return {
     pointerPlate,
-    pointerPlateInfo,
+    data,
   }
 }

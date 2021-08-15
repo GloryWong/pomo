@@ -1,6 +1,29 @@
-export function useEventHandler({ readyRotate, rotate, stopRotate }: any) {
+import { ClientPos } from '.'
+
+export function useEventHandler({
+  timer,
+  landAngleOnFly,
+  timeRangeData,
+  readyRotate,
+  rotate,
+  stopRotate,
+}: any) {
+  const _readyRotate = (clientPos: ClientPos) => {
+    readyRotate(clientPos, () => {
+      timer.pause()
+    })
+  }
+
+  const _stopRotate = () => {
+    stopRotate(() => {
+      landAngleOnFly()
+      // Start timer
+      timer.setRange(0, timeRangeData.pointOnFly * 60).start()
+    })
+  }
+
   const mousedownHandler = (event: MouseEvent): void => {
-    readyRotate({
+    _readyRotate({
       clientX: event.clientX,
       clientY: event.clientY,
     })
@@ -14,13 +37,13 @@ export function useEventHandler({ readyRotate, rotate, stopRotate }: any) {
   }
 
   const mouseupHandler = (event: MouseEvent): void => {
-    stopRotate()
+    _stopRotate()
   }
   const mouseoutHandler = mouseupHandler
 
   const touchstartHandler = (event: TouchEvent): void => {
     const touch = event.targetTouches[0]
-    readyRotate({
+    _readyRotate({
       clientX: touch.clientX,
       clientY: touch.clientY,
     })
@@ -35,7 +58,7 @@ export function useEventHandler({ readyRotate, rotate, stopRotate }: any) {
   }
 
   const touchendHandler = (event: TouchEvent): void => {
-    stopRotate()
+    _stopRotate()
   }
   const touchcancelHandler = touchendHandler
 

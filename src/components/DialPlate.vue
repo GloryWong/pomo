@@ -28,20 +28,24 @@
         m-auto
       "
       :style="{
-        transform: `rotate(${getAngleOnFly()}deg`,
+        transform: `rotate(${timeRangeData.angleOnFly}deg`,
       }"
     >
       <div
-        v-for="{ time, angle, primary, timeVisible } in timeRangeInfo.points"
-        :key="time"
+        v-for="{ text, angle, primary, textVisible } in timeRangeData.points"
+        :key="angle"
         class="absolute top-0 left-1/2 w-1/100 flex justify-center"
         :class="[
           `${primary ? 'w-1/100' : 'w-1/200'}`,
           `${primary ? 'h-1/24' : 'h-1/48'}`,
-          `${angle === getAngleOnFly() ? 'bg-neutral' : 'bg-neutral-lighter'}`,
+          `${
+            angle === timeRangeData.angleOnFly
+              ? 'bg-neutral'
+              : 'bg-neutral-lighter'
+          }`,
         ]"
         :style="[
-          `transform-origin: center ${timeRangeInfo.radius}px`,
+          `transform-origin: center ${timeRangeData.radius}px`,
           `transform: translateX(-50%) rotate(${360 - angle}deg)`,
         ]"
       >
@@ -57,9 +61,9 @@
             text-lg
             sm:text-2xl
           "
-          :style="`transform: rotate(${angle - getAngleOnFly()}deg)`"
+          :style="`transform: rotate(${angle - timeRangeData.angleOnFly}deg)`"
         >
-          {{ timeVisible ? time : '' }}
+          {{ textVisible ? text : '' }}
         </div>
       </div>
     </div>
@@ -100,10 +104,11 @@
           top-0
           left-1/2
         "
-        :style="`transform-origin: center ${pointerPlateInfo.radius}px; transform: translateX(-50%)`"
+        :style="`transform-origin: center ${pointerPlateData.radius}px; transform: translateX(-50%)`"
       ></div>
       <div class="time-box text-neutral-light text-4xl sm:text-5xl">
-        {{ paddedTime.minutes }} : {{ paddedTime.seconds }}
+        {{ timeRangeData.paddedTime.minutes }} :
+        {{ timeRangeData.paddedTime.seconds }}
       </div>
     </div>
     <div
@@ -129,32 +134,34 @@
     useSound,
     useRotate,
     useEventHandler,
+    useWinResizeObserver,
   } from '../composables'
 
-  const { dialPlateSize, getAngleOnFly, setAngleOnFly } = useDialPlate()
-  const { pointerPlate, pointerPlateInfo } = usePointerPlate()
+  const { winResizeObserver } = useWinResizeObserver()
+  const { size: dialPlateSize } = useDialPlate({
+    winResizeObserver,
+  })
+  const { pointerPlate, data: pointerPlateData } = usePointerPlate({
+    winResizeObserver,
+  })
   const {
     timeRange,
-    timeRangeInfo,
-    calculateMouseOffsetAngleToCenter,
-    setPointerAngle,
+    data: timeRangeData,
+    getAngleToTimeRangeCenter,
+    moveAngleOnFly,
+    landAngleOnFly,
   } = useTimeRange({
-    setAngleOnFly,
+    winResizeObserver,
   })
   const { timer } = useTimer({
-    timeRangeInfo,
-    getAngleOnFly,
-    setAngleOnFly,
+    timeRangeData,
   })
 
-  const { readyRotate, rotate, stopRotate, paddedTime, time } = useRotate({
-    getAngleOnFly,
-    timeRangeInfo,
-    timer,
-    timeRange,
-    calculateMouseOffsetAngleToCenter,
-    setPointerAngle,
-    pointerPlateInfo,
+  const { readyRotate, rotate, stopRotate, rotating } = useRotate({
+    timeRangeData,
+    getAngleToTimeRangeCenter,
+    moveAngleOnFly,
+    pointerPlateData,
   })
 
   const {
@@ -166,17 +173,22 @@
     touchmoveHandler,
     touchendHandler,
   } = useEventHandler({
+    timer,
+    landAngleOnFly,
+    timeRangeData,
+    pointerPlateData,
     readyRotate,
     rotate,
     stopRotate,
   })
 
   useSound({
-    time,
-    pointerPlateInfo,
+    timeRangeData,
+    pointerPlateData,
+    rotating,
   })
 
   onMounted(() => {
-    setAngleOnFly(timeRangeInfo.angle)
+    timeRangeData.angleOnFly = timeRangeData.angle
   })
 </script>

@@ -1,63 +1,39 @@
-import { formatMinute, angleToMinute } from '../shared/util'
-import { computed } from 'vue'
 import { ClientPos } from './'
+import { ref } from 'vue'
 
-export function useRotate({
-  getAngleOnFly,
-  timeRangeInfo,
-  timer,
-  timeRange,
-  calculateMouseOffsetAngleToCenter,
-  setPointerAngle,
-  pointerPlateInfo,
-}: any) {
-  let _startAngle = 0
-  let _rotation = 0
-  const time = computed(() =>
-    angleToMinute(getAngleOnFly(), timeRangeInfo.pointOffsetAngle)
-  )
-  const paddedTime = computed(() => formatMinute(time.value))
+export function useRotate({ getAngleToTimeRangeCenter, moveAngleOnFly }: any) {
+  let startAngle = 0
+  let angleChange = 0
+  let rotating = ref(false)
 
-  function readyRotate(clientPos: ClientPos): void {
-    timer.pause()
-    _startAngle = calculateMouseOffsetAngleToCenter(
-      clientPos,
-      timeRange.value as Element
-    )
-    pointerPlateInfo.active = true
+  function readyRotate(clientPos: ClientPos, callback: Function): void {
+    rotating.value = true
+    startAngle = getAngleToTimeRangeCenter(clientPos)
+    callback()
   }
 
   function rotate(clientPos: ClientPos): void {
-    if (!pointerPlateInfo.active) {
+    if (!rotating.value) {
       return
     }
 
-    const currentAngle = calculateMouseOffsetAngleToCenter(
-      clientPos,
-      timeRange.value as Element
-    )
+    const currentAngle = getAngleToTimeRangeCenter(clientPos)
 
-    _rotation = currentAngle - _startAngle
-    _rotation < 0 && (_rotation += 360)
+    angleChange = currentAngle - startAngle
+    angleChange < 0 && (angleChange += 360)
 
-    setPointerAngle(_rotation)
+    moveAngleOnFly(angleChange)
   }
 
-  function stopRotate(): void {
-    timeRangeInfo.angle = getAngleOnFly()
-    pointerPlateInfo.active = false
-    startTimer(angleToMinute(getAngleOnFly(), timeRangeInfo.pointOffsetAngle))
-  }
-
-  function startTimer(time: number) {
-    timer.setRange(0, time * 60).start()
+  function stopRotate(callback: Function): void {
+    rotating.value = false
+    callback()
   }
 
   return {
+    rotating,
     readyRotate,
     rotate,
     stopRotate,
-    paddedTime,
-    time,
   }
 }
