@@ -9,6 +9,9 @@ export function useTimer({ timeRangeData, state, stateOperations }: any) {
         timeRangeData.angleOnFly - secondToAngle(1, timeRangeData.unitAngle)
       timeRangeData.angleOnFly = timeRangeData.angle
     },
+    finishedCallbacks: () => {
+      stateOperations.finish()
+    },
   })
 
   watch(state, () => {

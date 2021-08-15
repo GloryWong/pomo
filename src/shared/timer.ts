@@ -1,8 +1,9 @@
 export type Callback = Function
 export type Callbacks = Callback | Array<Callback>
 export type StepCallbacks = Callbacks
+export type FinishedCallbacks = Callbacks
 enum State {
-  READY = 0,
+  READY = 1,
   RUNNING,
 }
 
@@ -15,6 +16,7 @@ export default class Timer {
   private intervalId: number = 0
   private asc: boolean = false
   private stepCallbacks: Set<Callback> = new Set()
+  private finishedCallbacks: Set<Callback> = new Set()
   private state: State = State.READY
 
   constructor({
@@ -24,6 +26,7 @@ export default class Timer {
     stepDuration,
     asc,
     stepCallbacks,
+    finishedCallbacks,
   }: {
     min?: number
     max?: number
@@ -31,6 +34,7 @@ export default class Timer {
     stepDuration?: number
     asc?: boolean
     stepCallbacks?: StepCallbacks
+    finishedCallbacks?: FinishedCallbacks
   }) {
     min && (this.min = min)
     max && (this.max = max)
@@ -38,6 +42,7 @@ export default class Timer {
     stepDuration && (this.stepDuration = stepDuration)
     asc !== undefined && (this.asc = asc)
     this.addStepCallbacks(stepCallbacks || [])
+    this.addFinishedCallbacks(finishedCallbacks || [])
     this.init()
   }
 
@@ -56,14 +61,22 @@ export default class Timer {
     return this.init()
   }
 
-  addStepCallbacks(stepCallbacks: StepCallbacks): Timer {
-    if (typeof stepCallbacks === 'function') {
-      this.stepCallbacks.add(stepCallbacks)
-    } else if (Array.isArray(stepCallbacks)) {
-      this.stepCallbacks = new Set([...this.stepCallbacks, ...stepCallbacks])
+  private addCallbacks(collection: Set<Callback>, callbacks: Callbacks): Timer {
+    if (typeof callbacks === 'function') {
+      collection.add(callbacks)
+    } else if (Array.isArray(callbacks)) {
+      collection = new Set([...collection, ...callbacks])
     }
 
     return this
+  }
+
+  addStepCallbacks(stepCallbacks: StepCallbacks): Timer {
+    return this.addCallbacks(this.stepCallbacks, stepCallbacks)
+  }
+
+  addFinishedCallbacks(finishedCallbacks: StepCallbacks): Timer {
+    return this.addCallbacks(this.finishedCallbacks, finishedCallbacks)
   }
 
   private invokeCallbacks(callbacks: Set<Callback>, data?: any): Timer {

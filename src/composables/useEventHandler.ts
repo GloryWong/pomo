@@ -1,7 +1,10 @@
 import { ClientPos } from '.'
 import { State } from '.'
+import { secondToAngle } from '../shared/util'
 
 export function useEventHandler({
+  timeRangeData,
+  singleDuration,
   landAngleOnFly,
   readyRotate,
   rotate,
@@ -48,6 +51,16 @@ export function useEventHandler({
   const mouseoutHandler = mouseupHandler
 
   const dblclickHandler = (): void => {
+    if (stateOperations.isReady() || stateOperations.isFinished()) {
+      timeRangeData.angleOnFly = secondToAngle(
+        singleDuration.value * 60,
+        timeRangeData.unitAngle
+      )
+      landAngleOnFly()
+      stateOperations.run()
+      return
+    }
+
     stateOperations.isRunning()
       ? stateOperations.pause()
       : stateOperations.run()

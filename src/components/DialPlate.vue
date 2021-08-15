@@ -39,17 +39,19 @@
         }"
       >
         <div
-          v-for="{ text, angle, primary, textVisible } in timeRangeData.points"
-          :key="angle"
+          v-for="{
+            text,
+            minute,
+            angle,
+            primary,
+            textVisible,
+          } in timeRangeData.points"
+          :key="minute"
           class="absolute top-0 left-1/2 w-1/100 flex justify-center"
           :class="[
             `${primary ? 'w-1/100' : 'w-1/200'}`,
             `${primary ? 'h-1/24' : 'h-1/48'}`,
-            `${
-              angle === timeRangeData.angleOnFly
-                ? 'bg-neutral'
-                : 'bg-neutral-lighter'
-            }`,
+            `${minute === singleDuration ? 'bg-yellow-500' : 'bg-neutral'}`,
           ]"
           :style="[
             `transform-origin: center ${timeRangeData.radius}px`,
@@ -69,6 +71,11 @@
               sm:text-2xl
               select-none
             "
+            :class="[
+              `${
+                minute === singleDuration ? 'text-yellow-300' : 'text-neutral'
+              }`,
+            ]"
             :style="`transform: rotate(${angle - timeRangeData.angleOnFly}deg)`"
           >
             {{ textVisible ? text : '' }}
@@ -195,9 +202,13 @@
     useRotate,
     useEventHandler,
     useWinResizeObserver,
+    useTomato,
   } from '../composables'
 
   const { winResizeObserver } = useWinResizeObserver()
+
+  const { cycleNumber, singleDuration, shortBreakDuration, longBreakDuration } =
+    useTomato()
 
   const {
     size: dialPlateSize,
@@ -247,8 +258,9 @@
     touchmoveHandler,
     touchendHandler,
   } = useEventHandler({
-    landAngleOnFly,
     timeRangeData,
+    singleDuration,
+    landAngleOnFly,
     pointerPlateData,
     readyRotate,
     rotate,

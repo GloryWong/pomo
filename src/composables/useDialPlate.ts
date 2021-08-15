@@ -18,6 +18,11 @@ export function useDialPlate({ winResizeObserver }: any) {
     size.value = Math.min(_size, MAX_SIZE)
   })
 
+  const isReady = (checkedStateValue?: State) =>
+    checkedStateValue
+      ? checkedStateValue === State.READY
+      : state.value === State.READY
+
   const run = () => {
     if (isRunning()) return
     state.value = State.RUNNING
@@ -48,6 +53,7 @@ export function useDialPlate({ winResizeObserver }: any) {
       : state.value === State.FINISHED
 
   const stateOperations = {
+    isReady,
     run,
     isRunning,
     pause,
