@@ -223,6 +223,7 @@
     data: timeRangeData,
     getAngleToTimeRangeCenter,
     moveAngleOnFly,
+    moveAngleOnFlyWithTransition,
     landAngleOnFly,
   } = useTimeRange({
     winResizeObserver,
@@ -260,6 +261,7 @@
   } = useEventHandler({
     timeRangeData,
     singleDuration,
+    moveAngleOnFlyWithTransition,
     landAngleOnFly,
     pointerPlateData,
     readyRotate,

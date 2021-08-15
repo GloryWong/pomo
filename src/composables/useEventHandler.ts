@@ -5,6 +5,7 @@ import { secondToAngle } from '../shared/util'
 export function useEventHandler({
   timeRangeData,
   singleDuration,
+  moveAngleOnFlyWithTransition,
   landAngleOnFly,
   readyRotate,
   rotate,
@@ -52,12 +53,14 @@ export function useEventHandler({
 
   const dblclickHandler = (): void => {
     if (stateOperations.isReady() || stateOperations.isFinished()) {
-      timeRangeData.angleOnFly = secondToAngle(
+      const angleChange = secondToAngle(
         singleDuration.value * 60,
         timeRangeData.unitAngle
       )
-      landAngleOnFly()
-      stateOperations.run()
+      moveAngleOnFlyWithTransition(angleChange, () => {
+        landAngleOnFly()
+        stateOperations.run()
+      })
       return
     }
 

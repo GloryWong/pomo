@@ -71,6 +71,24 @@ export function useTimeRange({ winResizeObserver }: any) {
     angleOnFly.value = _angleOnFly
   }
 
+  const moveAngleOnFlyWithTransition = (
+    angleChange: number,
+    callback: Function
+  ) => {
+    let steps = angleChange / unitAngle.value
+
+    let count = 0
+    const id = setInterval(() => {
+      if (steps-- < 0) {
+        clearInterval(id)
+        callback()
+        return
+      }
+
+      moveAngleOnFly(unitAngle.value * count++)
+    }, 20)
+  }
+
   const landAngleOnFly = () => {
     angle.value = angleOnFly.value
   }
@@ -104,6 +122,7 @@ export function useTimeRange({ winResizeObserver }: any) {
     data,
     getAngleToTimeRangeCenter,
     moveAngleOnFly,
+    moveAngleOnFlyWithTransition,
     landAngleOnFly,
   }
 }
