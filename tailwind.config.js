@@ -22,6 +22,9 @@ module.exports = {
         10: '10px',
         15: '15px',
       },
+      cursor: {
+        grab: 'grab',
+      },
       colors: {
         primary: {
           light: '#EC4C30',

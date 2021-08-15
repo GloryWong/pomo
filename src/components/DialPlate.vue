@@ -13,12 +13,11 @@
     :style="`width: ${dialPlateSize}px; height: ${dialPlateSize}px;`"
   >
     <div
-      ref="timeRange"
       class="
-        time-range
+        time-range-plate
         absolute
-        w-3/4
-        h-3/4
+        w-full
+        h-full
         rounded-full
         absolute
         top-0
@@ -26,46 +25,66 @@
         bottom-0
         left-0
         m-auto
+        flex
+        justify-center
+        items-center
+        overflow-hidden
       "
-      :style="{
-        transform: `rotate(${timeRangeData.angleOnFly}deg`,
-      }"
     >
       <div
-        v-for="{ text, angle, primary, textVisible } in timeRangeData.points"
-        :key="angle"
-        class="absolute top-0 left-1/2 w-1/100 flex justify-center"
-        :class="[
-          `${primary ? 'w-1/100' : 'w-1/200'}`,
-          `${primary ? 'h-1/24' : 'h-1/48'}`,
-          `${
-            angle === timeRangeData.angleOnFly
-              ? 'bg-neutral'
-              : 'bg-neutral-lighter'
-          }`,
-        ]"
-        :style="[
-          `transform-origin: center ${timeRangeData.radius}px`,
-          `transform: translateX(-50%) rotate(${360 - angle}deg)`,
-        ]"
+        ref="timeRange"
+        class="time-range w-3/4 h-3/4 rounded-full"
+        :style="{
+          transform: `rotate(${timeRangeData.angleOnFly}deg`,
+        }"
       >
         <div
-          class="
-            flex
-            justify-center
-            absolute
-            -top-7
-            sm:-top-10
-            text-neutral-lighter
-            font-bold
-            text-lg
-            sm:text-2xl
-          "
-          :style="`transform: rotate(${angle - timeRangeData.angleOnFly}deg)`"
+          v-for="{ text, angle, primary, textVisible } in timeRangeData.points"
+          :key="angle"
+          class="absolute top-0 left-1/2 w-1/100 flex justify-center"
+          :class="[
+            `${primary ? 'w-1/100' : 'w-1/200'}`,
+            `${primary ? 'h-1/24' : 'h-1/48'}`,
+            `${
+              angle === timeRangeData.angleOnFly
+                ? 'bg-neutral'
+                : 'bg-neutral-lighter'
+            }`,
+          ]"
+          :style="[
+            `transform-origin: center ${timeRangeData.radius}px`,
+            `transform: translateX(-50%) rotate(${360 - angle}deg)`,
+          ]"
         >
-          {{ textVisible ? text : '' }}
+          <div
+            class="
+              flex
+              justify-center
+              absolute
+              -top-7
+              sm:-top-10
+              text-neutral-lighter
+              font-bold
+              text-lg
+              sm:text-2xl
+              select-none
+            "
+            :style="`transform: rotate(${angle - timeRangeData.angleOnFly}deg)`"
+          >
+            {{ textVisible ? text : '' }}
+          </div>
         </div>
       </div>
+      <div
+        class="mask absolute w-full h-full rounded-full cursor-grab"
+        @mousedown.prevent="mousedownHandler"
+        @mousemove.prevent="mousemoveHandler"
+        @mouseup.prevent="mouseupHandler"
+        @mouseout.prevent="mouseoutHandler"
+        @touchstart.prevent="touchstartHandler"
+        @touchmove.prevent="touchmoveHandler"
+        @touchend.prevent="touchendHandler"
+      ></div>
     </div>
     <div
       ref="pointerPlate"
@@ -111,16 +130,6 @@
         {{ timeRangeData.paddedTime.seconds }}
       </div>
     </div>
-    <div
-      class="mask absolute w-full h-full rounded-full cursor-pointer"
-      @mousedown.prevent="mousedownHandler"
-      @mousemove.prevent="mousemoveHandler"
-      @mouseup.prevent="mouseupHandler"
-      @mouseout.prevent="mouseoutHandler"
-      @touchstart.prevent="touchstartHandler"
-      @touchmove.prevent="touchmoveHandler"
-      @touchend.prevent="touchendHandler"
-    ></div>
   </div>
 </template>
 
