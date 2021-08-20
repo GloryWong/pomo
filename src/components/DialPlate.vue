@@ -31,13 +31,7 @@
         overflow-hidden
       "
     >
-      <div
-        ref="timeRange"
-        class="time-range w-3/4 h-3/4 rounded-full"
-        :style="{
-          transform: `rotate(${timeRangeData.angleOnFly}deg`,
-        }"
-      >
+      <div ref="timeRange" class="time-range w-3/4 h-3/4 rounded-full">
         <div
           v-for="{
             text,
@@ -51,7 +45,11 @@
           :class="[
             `${primary ? 'w-1/100' : 'w-1/200'}`,
             `${primary ? 'h-1/24' : 'h-1/48'}`,
-            `${minute === singleDuration ? 'bg-yellow-500' : 'bg-neutral'}`,
+            `${
+              minute === tomatoConfig.SINGLE_DURATION
+                ? 'bg-yellow-500'
+                : 'bg-neutral'
+            }`,
           ]"
           :style="[
             `transform-origin: center ${timeRangeData.radius}px`,
@@ -73,24 +71,20 @@
             "
             :class="[
               `${
-                minute === singleDuration ? 'text-yellow-300' : 'text-neutral'
+                minute === tomatoConfig.SINGLE_DURATION
+                  ? 'text-yellow-300'
+                  : 'text-neutral'
               }`,
             ]"
-            :style="`transform: rotate(${angle - timeRangeData.angleOnFly}deg)`"
+            :style="`transform: rotate(${angle - timeRangeData.angle}deg)`"
           >
             {{ textVisible ? text : '' }}
           </div>
         </div>
       </div>
       <div
+        ref="timeRangeInteraction"
         class="mask absolute w-full h-full rounded-full cursor-grab"
-        @mousedown.prevent="mousedownHandler"
-        @mousemove.prevent="mousemoveHandler"
-        @mouseup.prevent="mouseupHandler"
-        @mouseout.prevent="mouseoutHandler"
-        @touchstart.prevent="touchstartHandler"
-        @touchmove.prevent="touchmoveHandler"
-        @touchend.prevent="touchendHandler"
       ></div>
     </div>
     <div
@@ -192,14 +186,11 @@
 </template>
 
 <script lang="ts" setup>
-  import { onMounted } from 'vue'
   import {
     useDialPlate,
-    useTimer,
     usePointerPlate,
     useTimeRange,
     useSound,
-    useRotate,
     useEventHandler,
     useWinResizeObserver,
     useTomato,
@@ -207,8 +198,8 @@
 
   const { winResizeObserver } = useWinResizeObserver()
 
-  const { cycleNumber, singleDuration, shortBreakDuration, longBreakDuration } =
-    useTomato()
+  const tomato = useTomato()
+  const { config: tomatoConfig } = tomato
 
   const {
     size: dialPlateSize,
@@ -220,13 +211,13 @@
 
   const {
     timeRange,
+    timeRangeInteraction,
     data: timeRangeData,
-    getAngleToTimeRangeCenter,
-    moveAngleOnFly,
-    moveAngleOnFlyWithTransition,
-    landAngleOnFly,
   } = useTimeRange({
     winResizeObserver,
+    state,
+    stateOperations,
+    tomato,
   })
 
   const { pointerPlate, data: pointerPlateData } = usePointerPlate({
@@ -236,48 +227,17 @@
     timeRangeData,
   })
 
-  useTimer({
+  const { dblclickHandler } = useEventHandler({
     timeRangeData,
+    pointerPlateData,
     state,
     stateOperations,
-  })
-
-  const { readyRotate, rotate, stopRotate, rotating } = useRotate({
-    timeRangeData,
-    getAngleToTimeRangeCenter,
-    moveAngleOnFly,
-    pointerPlateData,
-  })
-
-  const {
-    mousedownHandler,
-    mousemoveHandler,
-    mouseupHandler,
-    mouseoutHandler,
-    dblclickHandler,
-    touchstartHandler,
-    touchmoveHandler,
-    touchendHandler,
-  } = useEventHandler({
-    timeRangeData,
-    singleDuration,
-    moveAngleOnFlyWithTransition,
-    landAngleOnFly,
-    pointerPlateData,
-    readyRotate,
-    rotate,
-    stopRotate,
-    state,
-    stateOperations,
+    tomato,
   })
 
   useSound({
     timeRangeData,
-    pointerPlateData,
-    rotating,
-  })
-
-  onMounted(() => {
-    timeRangeData.angleOnFly = timeRangeData.angle
+    state,
+    stateOperations,
   })
 </script>

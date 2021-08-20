@@ -1,5 +1,12 @@
-import { ref, reactive, onMounted, computed, watchEffect } from 'vue'
-import { roundAngle, angleToMinute, formatMinute } from '../shared/util'
+import { ref, reactive, onMounted, computed, watch } from 'vue'
+import {
+  angleToMinute,
+  formatMinute,
+  minuteToAngle,
+  secondToAngle,
+} from '../shared/util'
+import { DragRotation2d } from '../shared/DragRotation2d'
+import { AutoRotation2d } from '../shared/AutoRotation2d'
 
 export type ClientPos = {
   clientX: number
@@ -14,9 +21,16 @@ export type TimePoint = {
   textVisible: boolean
 }
 
-export function useTimeRange({ winResizeObserver }: any) {
+export function useTimeRange({
+  winResizeObserver,
+  state,
+  stateOperations,
+  tomato,
+}: any) {
   const timeRange = ref<unknown>(null)
+  const timeRangeInteraction = ref<unknown>(null)
   let $timeRange: HTMLElement
+  let $timeRangeInteraction: HTMLElement
 
   const points = reactive([] as TimePoint[])
   const range = {
@@ -31,11 +45,13 @@ export function useTimeRange({ winResizeObserver }: any) {
     clientX: 0,
     clientY: 0,
   })
-  const angleOnFly = ref(0)
-  const pointOnFly = computed(() =>
-    angleToMinute(angleOnFly.value, unitAngle.value)
-  )
-  const paddedTime = computed(() => formatMinute(pointOnFly.value))
+  const time = computed(() => angleToMinute(angle.value, unitAngle.value))
+  const paddedTime = computed(() => formatMinute(time.value))
+  const dragRotating = ref(false)
+  const autoRotating = ref(false)
+  const dragRotation2d = ref<DragRotation2d>()
+  const autoRotation2d = ref<AutoRotation2d>()
+  const tomatoConsumeAutoRotation2d = ref<AutoRotation2d>()
 
   const createPoints = () => {
     const { min, max } = range
@@ -51,50 +67,67 @@ export function useTimeRange({ winResizeObserver }: any) {
     }
   }
 
-  const getAngleToTimeRangeCenter = (clientPos: ClientPos): number => {
-    const R2D = 180 / Math.PI
-    const x = clientPos.clientX - centerPos.value.clientX
-    const y = clientPos.clientY - centerPos.value.clientY
-    let _angle = R2D * Math.atan2(y, x)
+  const createAutoRotation2d = () =>
+    new AutoRotation2d($timeRange, {
+      initialAngle: angle.value,
+      stepAngle: secondToAngle(1, unitAngle.value),
+      callbackCollection: {
+        readyRotate: ({ rotating }) => {
+          autoRotating.value = rotating as boolean
+        },
+        rotate: ({ angle: _angle }) => {
+          angle.value = _angle as number
+        },
+        stopRotate: ({ angle: _angle, rotating }) => {
+          autoRotating.value = rotating as boolean
+          stateOperations.finish()
+        },
+      },
+    })
 
-    // convert to css coordination system
-    _angle += 90
-    _angle < 0 && (_angle += 360)
+  const createDragRotation2d = (autoRotation2d: AutoRotation2d) =>
+    new DragRotation2d($timeRange, {
+      interactionEl: $timeRangeInteraction,
+      initialAngle: angle.value,
+      stepAngle: unitAngle.value,
+      callbackCollection: {
+        readyRotate: ({ rotating }) => {
+          dragRotating.value = rotating as boolean
+          autoRotation2d.pauseTransition()
+        },
+        rotate: ({ flyingAngle }) => {
+          angle.value = flyingAngle as number
+        },
+        stopRotate: ({ rotating }) => {
+          dragRotating.value = rotating as boolean
 
-    return _angle
-  }
+          if (
+            stateOperations.isReady() ||
+            stateOperations.isFinished() ||
+            stateOperations.isRunning()
+          ) {
+            autoRotation2d.transitFromTo(angle.value, 0)
+            stateOperations.run()
+          }
+        },
+      },
+    })
 
-  const moveAngleOnFly = (angleChange: number): void => {
-    let _angleOnFly = roundAngle(angle.value + angleChange, unitAngle.value)
-    _angleOnFly > 360 && (_angleOnFly -= 360)
-
-    angleOnFly.value = _angleOnFly
-  }
-
-  const moveAngleOnFlyWithTransition = (
-    angleChange: number,
-    callback: Function
-  ) => {
-    let steps = angleChange / unitAngle.value
-
-    let count = 0
-    const id = setInterval(() => {
-      if (steps-- < 0) {
-        clearInterval(id)
-        callback()
-        return
-      }
-
-      moveAngleOnFly(unitAngle.value * count++)
-    }, 20)
-  }
-
-  const landAngleOnFly = () => {
-    angle.value = angleOnFly.value
-  }
+  const createTomatoConsumeAutoRotation2d = (autoRotation2d: AutoRotation2d) =>
+    new AutoRotation2d($timeRange, {
+      initialAngle: 0,
+      callbackCollection: {
+        stopRotate({ angle: _angle }) {
+          angle.value = _angle as number
+          autoRotation2d.transitFromTo(angle.value, 0)
+        },
+      },
+    })
 
   onMounted(() => {
     $timeRange = timeRange.value as HTMLElement
+    $timeRangeInteraction = timeRangeInteraction.value as HTMLElement
+
     winResizeObserver.register(() => {
       const { left, top, width, height } = $timeRange.getBoundingClientRect()
       size.value = width
@@ -104,6 +137,42 @@ export function useTimeRange({ winResizeObserver }: any) {
 
     unitAngle.value = 360 / (range.max - range.min)
     createPoints()
+
+    // AutoRotation2d
+    autoRotation2d.value = createAutoRotation2d()
+    // DragRotation2d
+    dragRotation2d.value = createDragRotation2d(autoRotation2d.value)
+    // Tomato consume AutoRotation2d
+    tomatoConsumeAutoRotation2d.value = createTomatoConsumeAutoRotation2d(
+      autoRotation2d.value
+    )
+  })
+
+  watch(state, () => {
+    if (!autoRotation2d.value || !dragRotation2d.value) return
+
+    if (stateOperations.isPaused()) {
+      autoRotation2d.value.pauseTransition()
+      return
+    }
+
+    if (stateOperations.isRunning()) {
+      // consume single tomato
+      if (
+        tomato.methods.isSingleTomatoPicked() &&
+        tomatoConsumeAutoRotation2d.value
+      ) {
+        tomatoConsumeAutoRotation2d.value.transitTo(
+          minuteToAngle(tomato.config.SINGLE_DURATION, unitAngle.value),
+          { speed: 800 }
+        )
+        tomato.methods.consumePickedSingleTomato()
+        return
+      }
+
+      autoRotation2d.value.transitFromTo(angle.value, 0)
+      return
+    }
   })
 
   const data = reactive({
@@ -112,17 +181,17 @@ export function useTimeRange({ winResizeObserver }: any) {
     unitAngle,
     angle,
     size,
-    angleOnFly,
-    pointOnFly,
+    time,
     paddedTime,
+    dragRotating,
+    autoRotating,
+    dragRotation2d,
+    autoRotation2d,
   })
 
   return {
     timeRange,
+    timeRangeInteraction,
     data,
-    getAngleToTimeRangeCenter,
-    moveAngleOnFly,
-    moveAngleOnFlyWithTransition,
-    landAngleOnFly,
   }
 }

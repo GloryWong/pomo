@@ -1,7 +1,3 @@
-export function roundAngle(angle: number, unit: number): number {
-  return Math.round(angle / unit) * unit
-}
-
 export function pad(number: number, digitLength: number): string {
   const padLength = Math.pow(10, digitLength - 1)
   return number >= padLength
@@ -14,7 +10,7 @@ export function formatMinute(minute: number): {
   seconds: string
 } {
   const minutes = Math.floor(minute)
-  const seconds = Math.floor((minute - minutes) * 60)
+  const seconds = Math.round((minute - minutes) * 60)
 
   return {
     minutes: pad(minutes, 2),
@@ -22,10 +18,18 @@ export function formatMinute(minute: number): {
   }
 }
 
-export function angleToMinute(angle: number, unit: number): number {
-  return angle / unit
+export function angleToMinute(angle: number, unitAngle: number): number {
+  return angle / unitAngle
 }
 
-export function secondToAngle(second: number, unit: number): number {
-  return (unit / 60) * second
+export function angleToSecond(angle: number, unitAngle: number): number {
+  return angleToMinute(angle, unitAngle) * 60
+}
+
+export function minuteToAngle(minute: number, unitAngle: number): number {
+  return minute * unitAngle
+}
+
+export function secondToAngle(second: number, unitAngle: number): number {
+  return minuteToAngle(second / 60, unitAngle)
 }
