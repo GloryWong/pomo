@@ -25,7 +25,5 @@ export function useWinResizeObserver() {
     },
   }
 
-  return {
-    winResizeObserver,
-  }
+  return winResizeObserver
 }

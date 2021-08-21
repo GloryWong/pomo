@@ -31,28 +31,28 @@
         overflow-hidden
       "
     >
-      <div ref="timeRange" class="time-range w-3/4 h-3/4 rounded-full">
+      <div ref="timeRangeElRef" class="time-range w-3/4 h-3/4 rounded-full">
         <div
           v-for="{
-            text,
             minute,
-            angle,
             primary,
+            text,
             textVisible,
-          } in timeRangeData.points"
+            angle,
+          } in timeRangePoints"
           :key="minute"
           class="absolute top-0 left-1/2 w-1/100 flex justify-center"
           :class="[
             `${primary ? 'w-1/100' : 'w-1/200'}`,
             `${primary ? 'h-1/24' : 'h-1/48'}`,
             `${
-              minute === tomatoConfig.SINGLE_DURATION
+              minute === tomato.config.SINGLE_DURATION
                 ? 'bg-yellow-500'
                 : 'bg-neutral'
             }`,
           ]"
           :style="[
-            `transform-origin: center ${timeRangeData.radius}px`,
+            `transform-origin: center ${timeRangeRadius}px`,
             `transform: translateX(-50%) rotate(${360 - angle}deg)`,
           ]"
         >
@@ -71,19 +71,19 @@
             "
             :class="[
               `${
-                minute === tomatoConfig.SINGLE_DURATION
+                minute === tomato.config.SINGLE_DURATION
                   ? 'text-yellow-300'
                   : 'text-neutral'
               }`,
             ]"
-            :style="`transform: rotate(${angle - timeRangeData.angle}deg)`"
+            :style="`transform: rotate(${angle - timeRangeAngle}deg)`"
           >
             {{ textVisible ? text : '' }}
           </div>
         </div>
       </div>
       <div
-        ref="timeRangeInteraction"
+        ref="timeRangeInteractionElRef"
         class="mask absolute w-full h-full rounded-full cursor-grab"
       ></div>
     </div>
@@ -142,7 +142,7 @@
             transition
             duration-500
           "
-          v-show="!stateOperations.isPaused()"
+          v-show="!state.isPaused()"
         >
           {{ pointerPlateData.timeText }}
         </div>
@@ -162,7 +162,7 @@
             transition
             duration-500
           "
-          v-show="stateOperations.isPaused()"
+          v-show="state.isPaused()"
         >
           {{ pointerPlateData.stateText }}
         </div>
@@ -187,6 +187,7 @@
 
 <script lang="ts" setup>
   import {
+    useState,
     useDialPlate,
     usePointerPlate,
     useTimeRange,
@@ -196,48 +197,44 @@
     useTomato,
   } from '../composables'
 
-  const { winResizeObserver } = useWinResizeObserver()
+  const winResizeObserver = useWinResizeObserver()
 
   const tomato = useTomato()
-  const { config: tomatoConfig } = tomato
 
-  const {
-    size: dialPlateSize,
-    state,
-    stateOperations,
-  } = useDialPlate({
+  const state = useState()
+
+  const { size: dialPlateSize } = useDialPlate({
     winResizeObserver,
   })
 
-  const {
-    timeRange,
-    timeRangeInteraction,
-    data: timeRangeData,
-  } = useTimeRange({
+  const timeRange = useTimeRange({
     winResizeObserver,
     state,
-    stateOperations,
     tomato,
   })
+  const {
+    timeRangeElRef,
+    timeRangeInteractionElRef,
+    points: timeRangePoints,
+    radius: timeRangeRadius,
+    angle: timeRangeAngle,
+  } = timeRange
 
   const { pointerPlate, data: pointerPlateData } = usePointerPlate({
     winResizeObserver,
     state,
-    stateOperations,
-    timeRangeData,
+    timeRange,
   })
 
   const { dblclickHandler } = useEventHandler({
-    timeRangeData,
+    timeRange,
     pointerPlateData,
     state,
-    stateOperations,
     tomato,
   })
 
   useSound({
-    timeRangeData,
+    timeRange,
     state,
-    stateOperations,
   })
 </script>

@@ -1,11 +1,6 @@
 import { ref, reactive, onMounted, watch } from 'vue'
 
-export function usePointerPlate({
-  winResizeObserver,
-  state,
-  stateOperations,
-  timeRangeData,
-}: any) {
+export function usePointerPlate({ winResizeObserver, state, timeRange }: any) {
   const pointerPlate = ref<unknown>(null)
   const data = reactive({
     size: 0,
@@ -24,23 +19,20 @@ export function usePointerPlate({
     })
   })
 
-  watch(
-    () => timeRangeData.paddedTime,
-    ({ minutes, seconds }) => {
-      data.timeText = `${minutes} : ${seconds}`
-    }
-  )
+  watch(timeRange.paddedTime, ({ minutes, seconds }) => {
+    data.timeText = `${minutes} : ${seconds}`
+  })
 
-  watch(state, () => {
-    if (stateOperations.isRunning()) {
+  watch(state.core, () => {
+    if (state.isRunning()) {
       data.stateText = 'RUNNING'
     }
 
-    if (stateOperations.isPaused()) {
+    if (state.isPaused()) {
       data.stateText = 'PAUSED'
     }
 
-    if (stateOperations.isFinished()) {
+    if (state.isFinished()) {
       data.stateText = 'FINISHED'
     }
   })

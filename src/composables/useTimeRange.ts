@@ -1,4 +1,13 @@
-import { ref, reactive, onMounted, computed, watch } from 'vue'
+import {
+  ref,
+  reactive,
+  onMounted,
+  computed,
+  watch,
+  readonly,
+  toRefs,
+  Ref,
+} from 'vue'
 import {
   angleToMinute,
   formatMinute,
@@ -21,18 +30,13 @@ export type TimePoint = {
   textVisible: boolean
 }
 
-export function useTimeRange({
-  winResizeObserver,
-  state,
-  stateOperations,
-  tomato,
-}: any) {
-  const timeRange = ref<unknown>(null)
-  const timeRangeInteraction = ref<unknown>(null)
-  let $timeRange: HTMLElement
-  let $timeRangeInteraction: HTMLElement
+export function useTimeRange({ winResizeObserver, state, tomato }: any) {
+  const timeRangeElRef = ref<unknown>(null)
+  const timeRangeInteractionElRef = ref<unknown>(null)
+  let $timeRangeEl: HTMLElement
+  let $timeRangeInteractionEl: HTMLElement
 
-  const points = reactive([] as TimePoint[])
+  const points = ref<TimePoint[]>([])
   const range = {
     min: 0,
     max: 60,
@@ -57,7 +61,7 @@ export function useTimeRange({
     const { min, max } = range
 
     for (let i = min; i <= max; i++) {
-      points.push({
+      points.value.push({
         minute: i,
         angle: unitAngle.value * i,
         primary: i % 5 === 0,
@@ -68,7 +72,7 @@ export function useTimeRange({
   }
 
   const createAutoRotation2d = () =>
-    new AutoRotation2d($timeRange, {
+    new AutoRotation2d($timeRangeEl, {
       initialAngle: angle.value,
       stepAngle: secondToAngle(1, unitAngle.value),
       callbackCollection: {
@@ -80,14 +84,14 @@ export function useTimeRange({
         },
         stopRotate: ({ angle: _angle, rotating }) => {
           autoRotating.value = rotating as boolean
-          stateOperations.finish()
+          state.finish()
         },
       },
     })
 
   const createDragRotation2d = (autoRotation2d: AutoRotation2d) =>
-    new DragRotation2d($timeRange, {
-      interactionEl: $timeRangeInteraction,
+    new DragRotation2d($timeRangeEl, {
+      interactionEl: $timeRangeInteractionEl,
       initialAngle: angle.value,
       stepAngle: unitAngle.value,
       callbackCollection: {
@@ -101,20 +105,16 @@ export function useTimeRange({
         stopRotate: ({ rotating }) => {
           dragRotating.value = rotating as boolean
 
-          if (
-            stateOperations.isReady() ||
-            stateOperations.isFinished() ||
-            stateOperations.isRunning()
-          ) {
+          if (state.isReady() || state.isFinished() || state.isRunning()) {
             autoRotation2d.transitFromTo(angle.value, 0)
-            stateOperations.run()
+            state.run()
           }
         },
       },
     })
 
   const createTomatoConsumeAutoRotation2d = (autoRotation2d: AutoRotation2d) =>
-    new AutoRotation2d($timeRange, {
+    new AutoRotation2d($timeRangeEl, {
       initialAngle: 0,
       callbackCollection: {
         stopRotate({ angle: _angle }) {
@@ -125,11 +125,11 @@ export function useTimeRange({
     })
 
   onMounted(() => {
-    $timeRange = timeRange.value as HTMLElement
-    $timeRangeInteraction = timeRangeInteraction.value as HTMLElement
+    $timeRangeEl = timeRangeElRef.value as HTMLElement
+    $timeRangeInteractionEl = timeRangeInteractionElRef.value as HTMLElement
 
     winResizeObserver.register(() => {
-      const { left, top, width, height } = $timeRange.getBoundingClientRect()
+      const { left, top, width, height } = $timeRangeEl.getBoundingClientRect()
       size.value = width
       radius.value = size.value / 2
       centerPos.value = { clientX: left + width / 2, clientY: top + height / 2 }
@@ -148,25 +148,22 @@ export function useTimeRange({
     )
   })
 
-  watch(state, () => {
+  watch(state.core, () => {
     if (!autoRotation2d.value || !dragRotation2d.value) return
 
-    if (stateOperations.isPaused()) {
+    if (state.isPaused()) {
       autoRotation2d.value.pauseTransition()
       return
     }
 
-    if (stateOperations.isRunning()) {
+    if (state.isRunning()) {
       // consume single tomato
-      if (
-        tomato.methods.isSingleTomatoPicked() &&
-        tomatoConsumeAutoRotation2d.value
-      ) {
+      if (tomato.isSingleTomatoPicked() && tomatoConsumeAutoRotation2d.value) {
         tomatoConsumeAutoRotation2d.value.transitTo(
           minuteToAngle(tomato.config.SINGLE_DURATION, unitAngle.value),
           { speed: 800 }
         )
-        tomato.methods.consumePickedSingleTomato()
+        tomato.consumePickedSingleTomato()
         return
       }
 
@@ -175,23 +172,16 @@ export function useTimeRange({
     }
   })
 
-  const data = reactive({
+  return {
+    timeRangeElRef,
+    timeRangeInteractionElRef,
+
     points,
     radius,
-    unitAngle,
     angle,
-    size,
     time,
     paddedTime,
     dragRotating,
     autoRotating,
-    dragRotation2d,
-    autoRotation2d,
-  })
-
-  return {
-    timeRange,
-    timeRangeInteraction,
-    data,
   }
 }

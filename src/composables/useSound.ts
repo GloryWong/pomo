@@ -1,7 +1,8 @@
 import * as Tone from 'tone'
+import { log } from 'tone/build/esm/core/util/Debug'
 import { watch } from 'vue'
 
-export function useSound({ timeRangeData, state, stateOperations }: any) {
+export function useSound({ timeRange, state }: any) {
   const synth = new Tone.Synth().toDestination()
   const synthEnd = new Tone.Synth().toDestination()
 
@@ -26,30 +27,27 @@ export function useSound({ timeRangeData, state, stateOperations }: any) {
     synthEnd.triggerAttackRelease('G7', '8n', now + 1)
   }
 
-  watch(
-    () => timeRangeData.time,
-    (value) => {
-      try {
-        let note: string
-        if (value === 0) {
-          return
-        }
-
-        note = timeRangeData.dragRotating
-          ? 'B2'
-          : value > 5
-          ? 'C2'
-          : `C${7 - Math.floor(value)}`
-
-        synth.triggerAttackRelease(note, '32n')
-      } catch (error) {
-        console.warn('Failed to play sound:', error)
+  watch(timeRange.time, (value: number) => {
+    try {
+      let note: string
+      if (value === 0) {
+        return
       }
-    }
-  )
 
-  watch(state, () => {
-    if (stateOperations.isFinished()) {
+      note = timeRange.dragRotating.value
+        ? 'B2'
+        : value > 5
+        ? 'C2'
+        : `C${7 - Math.floor(value)}`
+
+      synth.triggerAttackRelease(note, '32n')
+    } catch (error) {
+      console.warn('Failed to play sound:', error)
+    }
+  })
+
+  watch(state.core, () => {
+    if (state.isFinished()) {
       playEndSound()
     }
   })
