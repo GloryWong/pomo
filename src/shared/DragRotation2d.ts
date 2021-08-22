@@ -6,7 +6,7 @@ import {
   CallbackParams,
   El,
   BaseOptions,
-} from './BaseRotation2D'
+} from './BaseRotation2d'
 
 export type InteractionEvent = MouseEvent | TouchEvent
 

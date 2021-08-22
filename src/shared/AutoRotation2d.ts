@@ -1,4 +1,4 @@
-import { BaseRotation2d, BaseOptions, El, Action } from './BaseRotation2D'
+import { BaseRotation2d, BaseOptions, El, Action } from './BaseRotation2d'
 import Timer from './timer'
 import { Merge, ValueOf, SetOptional } from 'type-fest'
 
