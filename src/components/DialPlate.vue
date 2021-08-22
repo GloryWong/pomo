@@ -127,46 +127,30 @@
         "
         :style="`transform-origin: center ${pointerPlateData.radius}px; transform: translateX(-50%)`"
       ></div>
-      <transition
-        enter-from-class="opacity-0 translate-y-0"
-        enter-to-class="opacity-1 -translate-y-2"
-        leave-from-class="opacity-1 -translate-y-2"
-        leave-to-class="opacity-0 translate-y-0"
+      <div
+        class="
+          time-text
+          text-neutral-light text-4xl
+          sm:text-5xl
+          select-none
+          transition
+          duration-500
+        "
       >
-        <div
-          class="
-            time-text
-            text-neutral-light text-4xl
-            sm:text-5xl
-            select-none
-            transition
-            duration-500
-          "
-          v-show="!state.isPaused()"
-        >
-          {{ pointerPlateData.timeText }}
-        </div>
-      </transition>
-      <transition
-        enter-from-class="opacity-0 translate-y-2"
-        enter-to-class="opacity-1 translate-y-0"
-        leave-from-class="opacity-1 translate-y-0"
-        leave-to-class="opacity-0 translate-y-2"
+        {{ pointerPlateData.timeText }}
+      </div>
+      <div
+        class="
+          state-text
+          text-neutral-light text-4xl
+          sm:text-5xl
+          select-none
+          transition
+          duration-500
+        "
       >
-        <div
-          class="
-            state-text
-            text-neutral-light text-4xl
-            sm:text-5xl
-            select-none
-            transition
-            duration-500
-          "
-          v-show="state.isPaused()"
-        >
-          {{ pointerPlateData.stateText }}
-        </div>
-      </transition>
+        {{ pointerPlateData.stateText }}
+      </div>
       <div
         class="
           mask

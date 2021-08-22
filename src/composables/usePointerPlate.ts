@@ -1,4 +1,4 @@
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, watch, watchEffect } from 'vue'
 
 export function usePointerPlate({ winResizeObserver, state, timeRange }: any) {
   const pointerPlate = ref<unknown>(null)
@@ -13,7 +13,9 @@ export function usePointerPlate({ winResizeObserver, state, timeRange }: any) {
 
   onMounted(() => {
     winResizeObserver.register(() => {
-      const { width } = (pointerPlate.value as Element).getBoundingClientRect()
+      const { width } = (
+        pointerPlate.value as HTMLElement
+      ).getBoundingClientRect()
       data.size = width
       data.radius = width / 2
     })
@@ -23,17 +25,26 @@ export function usePointerPlate({ winResizeObserver, state, timeRange }: any) {
     data.timeText = `${minutes} : ${seconds}`
   })
 
-  watch(state.core, () => {
+  watchEffect(() => {
+    state.core
+    if (state.isReady()) {
+      data.stateText = 'READY'
+      return
+    }
+
     if (state.isRunning()) {
       data.stateText = 'RUNNING'
+      return
     }
 
     if (state.isPaused()) {
       data.stateText = 'PAUSED'
+      return
     }
 
     if (state.isFinished()) {
       data.stateText = 'FINISHED'
+      return
     }
   })
 

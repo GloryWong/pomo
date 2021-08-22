@@ -1,8 +1,10 @@
 <template>
+  <!-- <ControlPanel /> -->
   <DialPlate />
 </template>
 
 <script lang="ts" setup>
+  import ControlPanel from './components/ControlPanel.vue'
   import DialPlate from './components/DialPlate.vue'
 </script>
 
