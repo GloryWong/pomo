@@ -170,22 +170,21 @@
 </template>
 
 <script lang="ts" setup>
+  import { inject } from 'vue'
   import {
-    useState,
     useDialPlate,
     usePointerPlate,
     useTimeRange,
     useSound,
     useEventHandler,
-    useWinResizeObserver,
-    useTomato,
+    Tomato,
+    WinResizeObserver,
+    State,
   } from '../composables'
 
-  const winResizeObserver = useWinResizeObserver()
-
-  const tomato = useTomato()
-
-  const state = useState()
+  const winResizeObserver = inject('winResizeObserver') as WinResizeObserver
+  const tomato = inject('tomato') as Tomato
+  const state = inject('state') as State
 
   const { size: dialPlateSize } = useDialPlate({
     winResizeObserver,

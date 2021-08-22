@@ -1,6 +1,6 @@
 import { ref, readonly } from 'vue'
 
-export enum State {
+export enum StateValue {
   READY = 1,
   RUNNING,
   PAUSED,
@@ -8,41 +8,41 @@ export enum State {
 }
 
 export function useState() {
-  const core = ref(State.READY)
+  const core = ref(StateValue.READY)
 
-  const isReady = (checkedStateValue?: State) =>
+  const isReady = (checkedStateValue?: StateValue) =>
     checkedStateValue
-      ? checkedStateValue === State.READY
-      : core.value === State.READY
+      ? checkedStateValue === StateValue.READY
+      : core.value === StateValue.READY
 
   const run = () => {
     if (isRunning()) return
-    core.value = State.RUNNING
+    core.value = StateValue.RUNNING
   }
 
-  const isRunning = (checkedStateValue?: State) =>
+  const isRunning = (checkedStateValue?: StateValue) =>
     checkedStateValue
-      ? checkedStateValue === State.RUNNING
-      : core.value === State.RUNNING
+      ? checkedStateValue === StateValue.RUNNING
+      : core.value === StateValue.RUNNING
 
   const pause = () => {
     if (!isRunning()) return
-    core.value = State.PAUSED
+    core.value = StateValue.PAUSED
   }
 
-  const isPaused = (checkedStateValue?: State) =>
+  const isPaused = (checkedStateValue?: StateValue) =>
     checkedStateValue
-      ? checkedStateValue === State.PAUSED
-      : core.value === State.PAUSED
+      ? checkedStateValue === StateValue.PAUSED
+      : core.value === StateValue.PAUSED
 
   const finish = () => {
-    core.value = State.FINISHED
+    core.value = StateValue.FINISHED
   }
 
-  const isFinished = (checkedStateValue?: State) =>
+  const isFinished = (checkedStateValue?: StateValue) =>
     checkedStateValue
-      ? checkedStateValue === State.FINISHED
-      : core.value === State.FINISHED
+      ? checkedStateValue === StateValue.FINISHED
+      : core.value === StateValue.FINISHED
 
   return {
     core: readonly(core),
@@ -55,3 +55,5 @@ export function useState() {
     isFinished,
   }
 }
+
+export type State = ReturnType<typeof useState>

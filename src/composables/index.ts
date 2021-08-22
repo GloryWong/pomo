@@ -6,3 +6,5 @@ export * from './useSound'
 export * from './useEventHandler'
 export * from './useWinResizeObserver'
 export * from './useTomato'
+
+export * from './useTomatoPanel'

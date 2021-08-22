@@ -27,3 +27,5 @@ export function useWinResizeObserver() {
 
   return winResizeObserver
 }
+
+export type WinResizeObserver = ReturnType<typeof useWinResizeObserver>

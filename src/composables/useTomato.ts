@@ -1,4 +1,4 @@
-import { toRefs, ref, readonly } from 'vue'
+import { toRefs, ref, readonly, Ref } from 'vue'
 
 // duration unit: minute
 export function useTomato() {
@@ -26,3 +26,5 @@ export function useTomato() {
     consumePickedSingleTomato,
   }
 }
+
+export type Tomato = ReturnType<typeof useTomato>

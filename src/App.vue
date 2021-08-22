@@ -1,11 +1,21 @@
 <template>
-  <!-- <ControlPanel /> -->
+  <ControlPanel />
   <DialPlate />
 </template>
 
 <script lang="ts" setup>
+  import { provide } from 'vue'
   import ControlPanel from './components/ControlPanel.vue'
   import DialPlate from './components/DialPlate.vue'
+
+  import { useTomato, useState, useWinResizeObserver } from './composables'
+  const tomato = useTomato()
+  const state = useState()
+  const winResizeObserver = useWinResizeObserver()
+
+  provide('tomato', tomato)
+  provide('state', state)
+  provide('winResizeObserver', winResizeObserver)
 </script>
 
 <style>
