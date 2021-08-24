@@ -26,7 +26,7 @@ export class AutoRotation2d extends BaseRotation2d {
   protected initTimer() {
     this.timer
       .addStepCallbacks(({ counter }: { counter: number }) => {
-        console.log(counter)
+        // console.log(counter)
         this.angle = counter
         this.setCssTransformRotate(this.angle).invokeCallbacks(Action.ROTATE)
       })
@@ -60,7 +60,7 @@ export class AutoRotation2d extends BaseRotation2d {
       speed: this.transition.speed,
     })
 
-    console.log('from', this.angle, 'to', this.transition.targetAngle)
+    // console.log('from', this.angle, 'to', this.transition.targetAngle)
 
     this.rotating = true
     this.invokeCallbacks(Action.READY_ROTATE)

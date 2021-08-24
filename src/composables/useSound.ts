@@ -25,7 +25,7 @@ export function useSound({ timeRange, state }: Options) {
   }
 
   function playHintSound() {
-    console.count()
+    // console.count()
 
     const now = Tone.now()
     synthEnd.triggerAttackRelease('C7', '8n', now)

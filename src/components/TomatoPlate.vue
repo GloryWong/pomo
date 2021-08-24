@@ -7,9 +7,11 @@
       <img
         class="w-full h-auto select-none"
         :class="[
-          { 'animate-pulse': n === allTomatoSize + 1 },
           {
-            'opacity-50': n > allTomatoSize + 1,
+            'animate-pulse': n === allTomatoSize + 1 && isActiveTomatoSpring(),
+          },
+          {
+            'opacity-50': n > allTomatoSize,
           },
         ]"
         src="../assets/tomato.svg"
@@ -21,11 +23,11 @@
 </template>
 
 <script lang="ts" setup>
-  import { inject } from 'vue'
+  import { inject, computed } from 'vue'
   import { Tomato } from '../composables'
 
   const tomato = inject('tomato') as Tomato
   const { CYCLE_NUMBER } = tomato.config
-  const { springQueue, springQueueRunning } = tomato
+  const { springQueue, springQueueRunning, isActiveTomatoSpring } = tomato
   const allTomatoSize = springQueue.allTomatoSize
 </script>

@@ -54,14 +54,17 @@ export abstract class BaseRotation2d {
       (this.angle = this.parseInitialAngle(options.initialAngle))
     this.rotationOriginPos =
       options.rotationOriginPos || BaseRotation2d.getCenterPos(this.el)
-    options.stepAngle && (this.stepAngle = options.stepAngle)
+    options.stepAngle &&
+      (this.stepAngle = BaseRotation2d.modeAngle(options.stepAngle))
     options.callbackCollection && this.addCallbacks(options.callbackCollection)
 
     this.init()
   }
 
   protected parseInitialAngle(initialAngle: InitialAngle): number {
-    return typeof initialAngle === 'number' ? initialAngle : initialAngle()
+    return typeof initialAngle === 'number'
+      ? BaseRotation2d.modeAngle(initialAngle)
+      : initialAngle()
   }
 
   static observer(variable: Primitive) {
@@ -143,7 +146,7 @@ export abstract class BaseRotation2d {
     return angle
   }
 
-  protected calculateAngleToCenter(pos: Pos): number {
+  protected computeAngleToCenter(pos: Pos): number {
     const x = pos.x - this.rotationOriginPos.x
     const y = pos.y - this.rotationOriginPos.y
     let _angle = BaseRotation2d.convertRadianToDegree(Math.atan2(y, x))

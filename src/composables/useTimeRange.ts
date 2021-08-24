@@ -106,6 +106,7 @@ export function useTimeRange({ winResizeObserver, state, tomato }: Options) {
       interactionEl: $timeRangeInteractionEl,
       initialAngle: () => angle.value,
       stepAngle: unitAngle.value,
+      circular: false,
       callbackCollection: {
         readyRotate: ({ rotating }) => {
           dragRotating.value = rotating as boolean

@@ -16,11 +16,13 @@ export type DragOptions = Merge<
   BaseOptions,
   {
     interactionEl?: HTMLElement
+    circular?: boolean
   }
 >
 
 export class DragRotation2d extends BaseRotation2d {
   protected interactionEl: HTMLElement = document.body
+  protected circular: boolean = true
 
   protected startAngle = 0
   protected flyingAngle = 0
@@ -34,6 +36,7 @@ export class DragRotation2d extends BaseRotation2d {
     this.options = options
     options.interactionEl &&
       (this.interactionEl = BaseRotation2d.parseElement(options.interactionEl))
+    options.circular !== undefined && (this.circular = options.circular)
 
     this.rotatingProxy = BaseRotation2d.observer(this.rotating)
     this.registerEventHandlers()
@@ -53,6 +56,17 @@ export class DragRotation2d extends BaseRotation2d {
     }
   }
 
+  protected computeFlyingAngle(angleChange: number): number {
+    const forcast = this.angle + angleChange
+
+    if (!this.circular) {
+      if (forcast < 0) return 0
+      if (forcast > 360) return 360
+    }
+
+    return this.roundAngle(BaseRotation2d.modeAngle(forcast))
+  }
+
   /// callbacks ///
 
   protected createCallbackParams(params?: CallbackParams): CallbackParams {
@@ -70,7 +84,7 @@ export class DragRotation2d extends BaseRotation2d {
     this.options.initialAngle &&
       (this.angle = this.parseInitialAngle(this.options.initialAngle))
     this.rotating = this.rotatingProxy.value = true
-    this.startAngle = this.calculateAngleToCenter(pos)
+    this.startAngle = this.computeAngleToCenter(pos)
 
     return this.invokeCallbacks(Action.READY_ROTATE)
   }
@@ -80,13 +94,11 @@ export class DragRotation2d extends BaseRotation2d {
       return this
     }
 
-    const currentAngle = this.calculateAngleToCenter(pos)
+    const currentAngle = this.computeAngleToCenter(pos)
 
     let angleChange = currentAngle - this.startAngle
 
-    this.flyingAngle = this.roundAngle(
-      BaseRotation2d.modeAngle(this.angle + angleChange)
-    )
+    this.flyingAngle = this.computeFlyingAngle(angleChange)
 
     return this.setCssTransformRotate(this.flyingAngle).invokeCallbacks(
       Action.ROTATE
