@@ -14,6 +14,11 @@ export function useState() {
   const core = ref(StateValue.READY)
   const hotToggled = ref(false)
 
+  const ready = () => {
+    if (isReady()) return
+    core.value = StateValue.READY
+  }
+
   const isReady = () => core.value === StateValue.READY
 
   const run = () => {
@@ -73,6 +78,7 @@ export function useState() {
 
   return {
     core: readonly(core),
+    ready,
     isReady,
     run,
     isRunning,
