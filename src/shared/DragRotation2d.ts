@@ -27,12 +27,13 @@ export class DragRotation2d extends BaseRotation2d {
   protected rotating = false
   protected rotatingProxy: any
 
+  protected options: DragOptions = {}
+
   constructor(el: El, options: DragOptions = {}) {
     super(el, options)
+    this.options = options
     options.interactionEl &&
-      (this.interactionEl = BaseRotation2d.resolveElement(
-        options.interactionEl
-      ))
+      (this.interactionEl = BaseRotation2d.parseElement(options.interactionEl))
 
     this.rotatingProxy = BaseRotation2d.observer(this.rotating)
     this.registerEventHandlers()
@@ -66,6 +67,8 @@ export class DragRotation2d extends BaseRotation2d {
   /// methods ///
 
   readyRotate(pos: Pos) {
+    this.options.initialAngle &&
+      (this.angle = this.parseInitialAngle(this.options.initialAngle))
     this.rotating = this.rotatingProxy.value = true
     this.startAngle = this.calculateAngleToCenter(pos)
 

@@ -1,6 +1,11 @@
 import { ref } from 'vue'
+import { WinResizeObserver } from './'
 
-export function useDialPlate({ winResizeObserver }: any) {
+type Options = {
+  winResizeObserver: WinResizeObserver
+}
+
+export function useDialPlate({ winResizeObserver }: Options) {
   const MAX_SIZE = 750 // pixel
   const PROPORTION_TO_CONTAINER = 0.9
   const size = ref(0)
@@ -14,3 +19,5 @@ export function useDialPlate({ winResizeObserver }: any) {
     size,
   }
 }
+
+export type DialPlate = ReturnType<typeof useDialPlate>

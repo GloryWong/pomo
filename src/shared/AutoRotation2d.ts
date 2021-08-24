@@ -48,6 +48,8 @@ export class AutoRotation2d extends BaseRotation2d {
   }
 
   startTransition() {
+    this.options.initialAngle &&
+      (this.angle = this.parseInitialAngle(this.options.initialAngle))
     if (this.transition.targetAngle === this.angle) {
       return this
     }

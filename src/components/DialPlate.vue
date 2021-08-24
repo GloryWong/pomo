@@ -45,11 +45,7 @@
           :class="[
             `${primary ? 'w-1/100' : 'w-1/200'}`,
             `${primary ? 'h-1/24' : 'h-1/48'}`,
-            `${
-              minute === tomato.config.SINGLE_DURATION
-                ? 'bg-yellow-500'
-                : 'bg-neutral'
-            }`,
+            `${minute === SINGLE_DURATION ? 'bg-yellow-500' : 'bg-neutral'}`,
           ]"
           :style="[
             `transform-origin: center ${timeRangeRadius}px`,
@@ -71,9 +67,7 @@
             "
             :class="[
               `${
-                minute === tomato.config.SINGLE_DURATION
-                  ? 'text-yellow-300'
-                  : 'text-neutral'
+                minute === SINGLE_DURATION ? 'text-yellow-300' : 'text-neutral'
               }`,
             ]"
             :style="`transform: rotate(${angle - timeRangeAngle}deg)`"
@@ -128,10 +122,16 @@
         :style="`transform-origin: center ${pointerPlateData.radius}px; transform: translateX(-50%)`"
       ></div>
       <div
+        class="desciption text-neutral-light text-1xl sm:text-2xl select-none"
+      >
+        {{ pointerPlateData.description }}
+      </div>
+      <div
         class="
           time-text
           text-neutral-light text-4xl
-          sm:text-5xl
+          mt-1
+          sm:mt-3 sm:text-5xl
           select-none
           transition
           duration-500
@@ -140,17 +140,36 @@
         {{ pointerPlateData.timeText }}
       </div>
       <div
+        class="tomato-plate w-1/2 h-1/5 flex justify-center items-center"
+        v-show="springQueueRunning"
+      >
+        <div class="w-full" v-for="n in CYCLE_NUMBER" :key="n">
+          <img
+            class="w-full h-auto select-none"
+            :class="[
+              { 'animate-pulse': n === allTomatoSize + 1 },
+              {
+                'opacity-50': n > allTomatoSize + 1,
+              },
+            ]"
+            src="../assets/tomato.svg"
+            loading="lazy"
+            alt="tomato"
+          />
+        </div>
+      </div>
+      <!-- <div
         class="
           state-text
-          text-neutral-light text-4xl
-          sm:text-5xl
+          text-neutral-light text-2xl
+          sm:text-3xl
           select-none
           transition
           duration-500
         "
       >
         {{ pointerPlateData.stateText }}
-      </div>
+      </div> -->
       <div
         class="
           mask
@@ -177,6 +196,11 @@
     useTimeRange,
     useSound,
     useEventHandler,
+    DialPlate,
+    PointerPlate,
+    TimeRange,
+    Sound,
+    EventHandler,
     Tomato,
     WinResizeObserver,
     State,
@@ -184,6 +208,9 @@
 
   const winResizeObserver = inject('winResizeObserver') as WinResizeObserver
   const tomato = inject('tomato') as Tomato
+  const { SINGLE_DURATION, CYCLE_NUMBER } = tomato.config
+  const { springQueue, springQueueRunning } = tomato
+  const allTomatoSize = springQueue.allTomatoSize
   const state = inject('state') as State
 
   const { size: dialPlateSize } = useDialPlate({
@@ -207,11 +234,10 @@
     winResizeObserver,
     state,
     timeRange,
+    tomato,
   })
 
   const { dblclickHandler } = useEventHandler({
-    timeRange,
-    pointerPlateData,
     state,
     tomato,
   })

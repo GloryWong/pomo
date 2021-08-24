@@ -1,8 +1,14 @@
 import * as Tone from 'tone'
 import { log } from 'tone/build/esm/core/util/Debug'
 import { watch } from 'vue'
+import { TimeRange, State } from '.'
 
-export function useSound({ timeRange, state }: any) {
+type Options = {
+  timeRange: TimeRange
+  state: State
+}
+
+export function useSound({ timeRange, state }: Options) {
   const synth = new Tone.Synth().toDestination()
   const synthEnd = new Tone.Synth().toDestination()
 
@@ -52,3 +58,5 @@ export function useSound({ timeRange, state }: any) {
     }
   })
 }
+
+export type Sound = ReturnType<typeof useSound>

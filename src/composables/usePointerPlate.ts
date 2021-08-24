@@ -1,6 +1,19 @@
 import { ref, reactive, onMounted, watch, watchEffect } from 'vue'
+import { TimeRange, WinResizeObserver, State, Tomato } from '.'
 
-export function usePointerPlate({ winResizeObserver, state, timeRange }: any) {
+type Options = {
+  winResizeObserver: WinResizeObserver
+  state: State
+  timeRange: TimeRange
+  tomato: Tomato
+}
+
+export function usePointerPlate({
+  winResizeObserver,
+  state,
+  timeRange,
+  tomato,
+}: Options) {
   const pointerPlate = ref<unknown>(null)
   const data = reactive({
     size: 0,
@@ -9,6 +22,7 @@ export function usePointerPlate({ winResizeObserver, state, timeRange }: any) {
     timeTextVisible: true,
     stateText: '',
     stateTextVisible: false,
+    description: '',
   })
 
   onMounted(() => {
@@ -48,8 +62,44 @@ export function usePointerPlate({ winResizeObserver, state, timeRange }: any) {
     }
   })
 
+  watchEffect(() => {
+    let description = 'Double Click'
+    state.core
+    if (tomato.springQueueRunning.value) {
+      if (tomato.activeSpring.value) {
+        description = 'Tomato Consuming'
+        state.isPaused() && (description = 'Tomato Paused')
+
+        if (tomato.isActiveShortBreakSpring()) {
+          description = 'Short Break'
+          state.isPaused() && (description = 'Short Break Paused')
+        }
+        if (tomato.isActiveLongBreakSpring()) {
+          description = 'Long Break'
+          state.isPaused() && (description = 'Long Break Paused')
+        }
+
+        timeRange.dragRotating.value && (description = 'Time Adjusting')
+      }
+    } else {
+      if (timeRange.dragRotating.value) {
+        description = 'Time Selecting'
+      }
+      if (state.isRunning()) {
+        description = 'Double Click To Pause'
+      }
+      if (state.isPaused()) {
+        description = 'Double Click To Resume'
+      }
+    }
+
+    data.description = description
+  })
+
   return {
     pointerPlate,
     data,
   }
 }
+
+export type PointerPlate = ReturnType<typeof usePointerPlate>

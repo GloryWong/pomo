@@ -21,8 +21,9 @@ type InnerCallbackCollection = Record<Action, Set<Callback>>
 
 /// consturctor parameters ///
 export type El = HTMLElement | string
+type InitialAngle = number | (() => number)
 export type BaseOptions = {
-  initialAngle?: number
+  initialAngle?: InitialAngle
   rotationOriginPos?: Pos // Client Position
   callbackCollection?: CallbackCollection
   stepAngle?: number
@@ -37,6 +38,8 @@ export abstract class BaseRotation2d {
   protected stepAngle: number = 1
   protected rotating: boolean = false
 
+  protected options: BaseOptions = {}
+
   protected innerCallbackCollection: InnerCallbackCollection = {
     [Action.READY_ROTATE]: new Set<Callback>(),
     [Action.ROTATE]: new Set<Callback>(),
@@ -44,15 +47,21 @@ export abstract class BaseRotation2d {
   }
 
   constructor(el: El, options: BaseOptions = {}) {
-    this.el = BaseRotation2d.resolveElement(el)
-    options.initialAngle && (this.angle = options.initialAngle)
+    this.options = options
+
+    this.el = BaseRotation2d.parseElement(el)
+    options.initialAngle &&
+      (this.angle = this.parseInitialAngle(options.initialAngle))
     this.rotationOriginPos =
       options.rotationOriginPos || BaseRotation2d.getCenterPos(this.el)
     options.stepAngle && (this.stepAngle = options.stepAngle)
-
     options.callbackCollection && this.addCallbacks(options.callbackCollection)
 
     this.init()
+  }
+
+  protected parseInitialAngle(initialAngle: InitialAngle): number {
+    return typeof initialAngle === 'number' ? initialAngle : initialAngle()
   }
 
   static observer(variable: Primitive) {
@@ -87,7 +96,7 @@ export abstract class BaseRotation2d {
     )
   }
 
-  static resolveElement(el: El) {
+  static parseElement(el: El) {
     let _el
     if (typeof el === 'string') {
       _el = document.querySelector<HTMLElement>(el)
@@ -180,7 +189,7 @@ export abstract class BaseRotation2d {
 
   /// callbacks ///
 
-  protected addCallbacks(callbackCollection: CallbackCollection) {
+  public addCallbacks(callbackCollection: CallbackCollection) {
     for (const action in callbackCollection) {
       const callbacks = callbackCollection[action as Action]
       if (!callbacks) continue
