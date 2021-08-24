@@ -139,25 +139,7 @@
       >
         {{ pointerPlateData.timeText }}
       </div>
-      <div
-        class="tomato-plate w-1/2 h-1/5 flex justify-center items-center"
-        v-show="springQueueRunning"
-      >
-        <div class="w-full" v-for="n in CYCLE_NUMBER" :key="n">
-          <img
-            class="w-full h-auto select-none"
-            :class="[
-              { 'animate-pulse': n === allTomatoSize + 1 },
-              {
-                'opacity-50': n > allTomatoSize + 1,
-              },
-            ]"
-            src="../assets/tomato.svg"
-            loading="lazy"
-            alt="tomato"
-          />
-        </div>
-      </div>
+      <TomatoPlate />
       <!-- <div
         class="
           state-text
@@ -189,6 +171,7 @@
 </template>
 
 <script lang="ts" setup>
+  import TomatoPlate from './TomatoPlate.vue'
   import { inject } from 'vue'
   import {
     useDialPlate,
@@ -196,11 +179,6 @@
     useTimeRange,
     useSound,
     useEventHandler,
-    DialPlate,
-    PointerPlate,
-    TimeRange,
-    Sound,
-    EventHandler,
     Tomato,
     WinResizeObserver,
     State,
@@ -208,9 +186,7 @@
 
   const winResizeObserver = inject('winResizeObserver') as WinResizeObserver
   const tomato = inject('tomato') as Tomato
-  const { SINGLE_DURATION, CYCLE_NUMBER } = tomato.config
-  const { springQueue, springQueueRunning } = tomato
-  const allTomatoSize = springQueue.allTomatoSize
+  const { SINGLE_DURATION } = tomato.config
   const state = inject('state') as State
 
   const { size: dialPlateSize } = useDialPlate({
