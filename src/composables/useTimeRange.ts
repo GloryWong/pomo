@@ -118,10 +118,10 @@ export function useTimeRange({ winResizeObserver, state, tomato }: Options) {
         stopRotate: ({ rotating, angle }) => {
           dragRotating.value = rotating as boolean
 
-          if (angle === 0) {
-            state.ready()
-            return
-          }
+          // if (angle === 0) {
+          //   state.finish()
+          //   return
+          // }
 
           if (!state.isPaused()) {
             autoRotation2d.transitFromTo(angle as number, 0)

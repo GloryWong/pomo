@@ -6,14 +6,13 @@
     <div class="w-full" v-for="n in CYCLE_NUMBER" :key="n">
       <img
         class="w-full h-auto select-none"
-        :class="[
-          {
-            'animate-pulse': n === allTomatoSize + 1 && isActiveTomatoSpring(),
-          },
-          {
-            'opacity-50': n > allTomatoSize,
-          },
-        ]"
+        :class="
+          n === allTomatoSize + 1 && isActiveTomatoSpring()
+            ? 'animate-pulse'
+            : n > allTomatoSize
+            ? 'opacity-50'
+            : ''
+        "
         src="../assets/tomato.svg"
         loading="lazy"
         alt="tomato"
