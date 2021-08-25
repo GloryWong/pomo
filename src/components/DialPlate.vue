@@ -45,7 +45,13 @@
           :class="[
             `${primary ? 'w-1/100' : 'w-1/200'}`,
             `${primary ? 'h-1/24' : 'h-1/48'}`,
-            `${minute === SINGLE_DURATION ? 'bg-yellow-500' : 'bg-neutral'}`,
+            `${
+              minute <= timeRangeTime
+                ? 'bg-yellow-300'
+                : minute === SINGLE_DURATION
+                ? 'bg-secondary-light'
+                : 'bg-neutral'
+            }`,
           ]"
           :style="[
             `transform-origin: center ${timeRangeRadius}px`,
@@ -67,7 +73,11 @@
             "
             :class="[
               `${
-                minute === SINGLE_DURATION ? 'text-yellow-300' : 'text-neutral'
+                minute <= timeRangeTime
+                  ? 'text-yellow-300'
+                  : minute === SINGLE_DURATION
+                  ? 'text-secondary-light'
+                  : 'text-neutral'
               }`,
             ]"
             :style="`transform: rotate(${angle - timeRangeAngle}deg)`"
@@ -204,6 +214,7 @@
     points: timeRangePoints,
     radius: timeRangeRadius,
     angle: timeRangeAngle,
+    time: timeRangeTime,
   } = timeRange
 
   const { pointerPlate, data: pointerPlateData } = usePointerPlate({
