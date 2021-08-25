@@ -75,7 +75,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { defineProps, inject } from 'vue'
+  import { inject } from 'vue'
   import { TimeRange, Tomato } from '../composables'
 
   const { timeRange } = defineProps<{

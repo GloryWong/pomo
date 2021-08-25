@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { inject, computed } from 'vue'
+  import { inject } from 'vue'
   import { Tomato } from '../composables'
 
   const tomato = inject('tomato') as Tomato

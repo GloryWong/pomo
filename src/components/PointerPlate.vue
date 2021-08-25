@@ -86,7 +86,7 @@
 </template>
 
 <script lang="ts" setup>
-  import { defineProps, inject } from 'vue'
+  import { inject } from 'vue'
   import TomatoPlate from './TomatoPlate.vue'
   import { PointerPlate, useEventHandler, State, Tomato } from '../composables'
 
