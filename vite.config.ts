@@ -9,9 +9,9 @@ export default defineConfig({
     VitePWA({
       includeAssets: ['favicon.ico', 'robots.txt', 'safari-pinned-tab.svg'],
       manifest: {
-        name: 'Pomodoro',
-        short_name: 'Pomodoro',
-        description: 'Pomodoro - Zhaozhao',
+        name: 'Pomo',
+        short_name: 'Pomo',
+        description: 'Pomo - Zhaozhao',
         theme_color: '#ffffff',
         icons: [
           {

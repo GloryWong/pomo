@@ -1,27 +1,52 @@
-# Vue 3 + Typescript + Vite
+<h1 align="center">
+<img src="screenshot.webp" width="300">
+</h1>
 
-This template should help get you started developing with Vue 3 and Typescript in Vite.
+# Pomo
 
-## Recommended IDE Setup
+Pomo is an easy use PWA application, which implements the major features of the [Pomodoro Technique](https://en.wikipedia.org/wiki/Pomodoro_Technique) and can be used as a free countdown clock.
 
-[VSCode](https://code.visualstudio.com/) + [Vetur](https://marketplace.visualstudio.com/items?itemName=octref.vetur). Make sure to enable `vetur.experimental.templateInterpolationService` in settings!
+Compared with other similar pomodora applications, Pomo allows users to flexibly adjust the current time point while any 'tomato' or 'break' is running. That feature meets users' requirements of increasing or decreaing the running time as user need. Nevertheless, the clock-like plate around the center display simplifys the operations on adjusting time without using or callouting device keybord.
 
-### If Using `<script setup>`
+## Two modes
 
-[`<script setup>`](https://github.com/vuejs/rfcs/pull/227) is a feature that is currently in RFC stage. To get proper IDE support for the syntax, use [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) instead of Vetur (and disable Vetur).
+- Pomodoro: start a pomodoro cycle from tapping center display area.
+- Countdown: rotate the clock-like plate to set a countdown and it starts automatically soon after the time is set.
 
-## Type Support For `.vue` Imports in TS
+---
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can use the following:
+# Tech Stack
 
-### If Using Volar
+- [Vue 3](https://v3.vuejs.org/)
+- [Vite](https://vitejs.dev/)
+- [Typescript](https://www.typescriptlang.org/)
+- [Tailwind CSS](https://tailwindcss.com/): [Quick setup](https://tailwindcss.com/docs/guides/vue-3-vite) of Tailwind CSS + Vue3 + Vite.
 
-Run `Volar: Switch TS Plugin on/off` from VSCode command palette.
+# Contribution
 
-### If Using Vetur
+## Commit
 
-1. Install and add `@vuedx/typescript-plugin-vue` to the [plugins section](https://www.typescriptlang.org/tsconfig#plugins) in `tsconfig.json`
-2. Delete `src/shims-vue.d.ts` as it is no longer needed to provide module info to Typescript
-3. Open `src/main.ts` in VSCode
-4. Open the VSCode command palette
-5. Search and run "Select TypeScript version" -> "Use workspace version"
+1. Fork it (<https://github.com/sr6033/lterm/fork>)
+2. Create your feature branch (`git checkout -b feature/fooBar`)
+3. Commit your changes (`git commit -am 'Add some fooBar'`)
+4. Push to the branch (`git push origin feature/fooBar`)
+5. Create a new Pull Request
+
+## Vue.js Devtools
+
+The [Vue.js devtools](https://chrome.google.com/webstore/detail/vuejs-devtools/ljjemllljcmogpfapbkkighbhhppjdbg) is a completely new version for Vue 3.
+
+## Recommended VSCode Setup
+
+- [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar): You need to disable `Vetur` to avoid conflicts.
+- [Tailwind CSS IntelliSense](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss)
+
+## Note
+
+This project mainly use the Vue3 feature `<script setup>`. To get proper IDE support for the syntax, use [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) instead of Vetur (and disable Vetur).
+
+## Q & A
+
+- Q: Unknow at rule of `@tailwind`
+
+  A: [Check here](https://stackoverflow.com/questions/47607602/how-to-add-a-tailwind-css-rule-to-css-checker)
