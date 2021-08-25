@@ -12,7 +12,11 @@ export enum Action {
 }
 
 export type CallbackParams = {
-  [key in string]: JsonValue | Primitive | HTMLElement
+  el: El
+  rotationOriginPos: Pos
+  angle: number
+  rotating: boolean
+  [extra: string]: JsonValue | Primitive | HTMLElement
 }
 export type Callback = (callbackParams: CallbackParams) => void
 export type Callbacks = Callback | Array<Callback> | Set<Callback>

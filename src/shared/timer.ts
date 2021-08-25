@@ -1,52 +1,61 @@
-import { Except } from 'type-fest'
+import { Except, Primitive, JsonValue } from 'type-fest'
 import NP from 'number-precision'
 
-export type Callback = Function
-export type Callbacks = Callback | Array<Callback>
-export type StepCallbacks = Callbacks
-export type FinishedCallbacks = Callbacks
 enum State {
-  READY = 1,
-  RUNNING,
-  PAUSED,
-  FINISHED,
+  READY = 'ready',
+  RUNNING = 'running',
+  PAUSED = 'paused',
+  FINISHED = 'finished',
 }
+
+export type CallbackParams = {
+  from: number
+  to: number
+  stepSize: number
+  speed: number
+  counter: number
+  asc: boolean
+  state: State
+}
+export type Callback = (callbackParams: CallbackParams) => void
+export type Callbacks = Callback | Array<Callback> | Set<Callback>
+export type CallbackCollection = Partial<Record<State, Callbacks>>
+type InnerCallbackCollection = Record<State, Set<Callback>>
 
 type Options = {
   from?: number
   to?: number
   stepSize?: number
   speed?: number
+  callbackCollection?: CallbackCollection
 }
 
 export default class Timer {
-  private from: number = 0
-  private to: number = 0
-  private stepSize: number = 1
-  private speed: number = 1 // unit: second per stepSize
-  private counter: number = 0
-  private intervalId: number = 0
-  private asc: boolean = false
-  private stepCallbacks: Set<Callback> = new Set()
-  private finishedCallbacks: Set<Callback> = new Set()
-  private state: State = State.READY
+  protected from: number = 0
+  protected to: number = 0
+  protected stepSize: number = 1
+  protected speed: number = 1 // unit: second per stepSize
 
-  constructor(
-    options?: Options,
-    {
-      stepCallbacks,
-      finishedCallbacks,
-    }: {
-      stepCallbacks?: StepCallbacks
-      finishedCallbacks?: FinishedCallbacks
-    } = {}
-  ) {
-    options && this.setOptoins(options)
-    stepCallbacks && this.addStepCallbacks(stepCallbacks)
-    finishedCallbacks && this.addFinishedCallbacks(finishedCallbacks)
+  protected counter: number = 0
+  private intervalId: number = 0
+  protected asc: boolean = false
+  protected state: State = State.READY
+
+  protected options: Options = {}
+
+  protected innerCallbackCollection: InnerCallbackCollection = {
+    [State.READY]: new Set<Callback>(),
+    [State.RUNNING]: new Set<Callback>(),
+    [State.PAUSED]: new Set<Callback>(),
+    [State.FINISHED]: new Set<Callback>(),
   }
 
-  private init() {
+  constructor(options: Options = {}) {
+    options && this.setOptoins(options)
+    options.callbackCollection && this.addCallbacks(options.callbackCollection)
+  }
+
+  protected init() {
     this.intervalId && clearInterval(this.intervalId)
     this.asc = this.from < this.to
     this.counter = this.from
@@ -54,7 +63,12 @@ export default class Timer {
     return this
   }
 
-  setOptoins(options: Options) {
+  public setOptoins(options: Options) {
+    this.options = {
+      ...this.options,
+      ...options,
+    }
+
     options.from && (this.from = options.from)
     options.to && (this.to = options.to)
     options.stepSize && (this.stepSize = options.stepSize)
@@ -63,30 +77,47 @@ export default class Timer {
     return this
   }
 
-  private addCallbacks(collection: Set<Callback>, callbacks: Callbacks): Timer {
-    if (typeof callbacks === 'function') {
-      collection.add(callbacks)
-    } else if (Array.isArray(callbacks)) {
-      collection = new Set([...collection, ...callbacks])
+  /// callbacks ///
+
+  public addCallbacks(callbackCollection: CallbackCollection) {
+    for (const state in callbackCollection) {
+      const callbacks = callbackCollection[state as State]
+      if (!callbacks) continue
+
+      const cbs = this.innerCallbackCollection[state as State] as Set<Callback>
+
+      if (callbacks instanceof Function) {
+        cbs.add(callbacks)
+      } else {
+        callbacks.forEach((cb) => cbs.add(cb))
+      }
     }
-
     return this
   }
 
-  addStepCallbacks(stepCallbacks: StepCallbacks): Timer {
-    return this.addCallbacks(this.stepCallbacks, stepCallbacks)
-  }
+  protected invokeCallbacks(state: State) {
+    let cbs = this.innerCallbackCollection[state]
 
-  addFinishedCallbacks(finishedCallbacks: StepCallbacks): Timer {
-    return this.addCallbacks(this.finishedCallbacks, finishedCallbacks)
-  }
-
-  private invokeCallbacks(callbacks: Set<Callback>, data?: any): Timer {
-    callbacks.forEach((callback) => callback(data))
+    cbs.forEach((cb) => cb(this.createCallbackParams()))
     return this
   }
 
-  private startInterval(): Timer {
+  protected createCallbackParams(params?: CallbackParams): CallbackParams {
+    return {
+      from: this.from,
+      to: this.from,
+      stepSize: this.stepSize,
+      speed: this.speed,
+      counter: this.counter,
+      asc: this.asc,
+      state: this.state,
+      ...params,
+    }
+  }
+
+  /// methods ///
+
+  protected startInterval(): Timer {
     if (this.state === State.RUNNING) {
       return this
     }
@@ -98,23 +129,19 @@ export default class Timer {
         (this.asc && this.counter >= this.to) ||
         (!this.asc && this.counter <= this.to)
       ) {
-        this.invokeCallbacks(this.finishedCallbacks, {
-          counter: this.counter,
-        })
+        this.invokeCallbacks(State.FINISHED)
         clearInterval(this.intervalId)
         return
       }
 
       this.counter = NP.plus(this.counter, this.stepSize * (this.asc ? 1 : -1))
-      this.invokeCallbacks(this.stepCallbacks, {
-        counter: this.counter,
-      })
+      this.invokeCallbacks(State.RUNNING)
     }, 1000 / this.speed)
 
     return this
   }
 
-  private pauseInterval(): Timer {
+  protected pauseInterval(): Timer {
     if (this.state !== State.RUNNING) {
       return this
     }
@@ -126,7 +153,7 @@ export default class Timer {
     return this
   }
 
-  private resumeInterval(): Timer {
+  protected resumeInterval(): Timer {
     if (this.state !== State.PAUSED) {
       return this
     }
@@ -134,26 +161,28 @@ export default class Timer {
     return this.startInterval()
   }
 
-  private resetInterval(): Timer {
+  protected resetInterval(): Timer {
     return this.init()
   }
 
-  start(): Timer {
+  /// api ///
+
+  public start(): Timer {
     this.startInterval()
     return this
   }
 
-  pause(): Timer {
+  public pause(): Timer {
     this.pauseInterval()
     return this
   }
 
-  resume(): Timer {
+  public resume(): Timer {
     this.resumeInterval()
     return this
   }
 
-  reset(): Timer {
+  public reset(): Timer {
     return this.resetInterval()
   }
 }

@@ -1,5 +1,5 @@
 import { BaseRotation2d, BaseOptions, El, Action } from './BaseRotation2d'
-import Timer from './timer'
+import Timer from './Timer'
 import { Merge, ValueOf, SetOptional } from 'type-fest'
 
 export type AutoOptions = Merge<BaseOptions, {}>
@@ -24,16 +24,17 @@ export class AutoRotation2d extends BaseRotation2d {
   }
 
   protected initTimer() {
-    this.timer
-      .addStepCallbacks(({ counter }: { counter: number }) => {
+    this.timer.addCallbacks({
+      running: ({ counter }) => {
         // console.log(counter)
         this.angle = counter
         this.setCssTransformRotate(this.angle).invokeCallbacks(Action.ROTATE)
-      })
-      .addFinishedCallbacks(() => {
+      },
+      finished: () => {
         this.rotating = false
         this.invokeCallbacks(Action.STOP_ROTATE)
-      })
+      },
+    })
     return this
   }
 

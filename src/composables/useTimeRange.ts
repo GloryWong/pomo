@@ -88,14 +88,14 @@ export function useTimeRange({ winResizeObserver, state, tomato }: Options) {
       stepAngle: secondToAngle(1, unitAngle.value),
       callbackCollection: {
         readyRotate: ({ rotating }) => {
-          autoRotating.value = rotating as boolean
+          autoRotating.value = rotating
           state.run()
         },
         rotate: ({ angle: _angle }) => {
-          angle.value = _angle as number
+          angle.value = _angle
         },
-        stopRotate: ({ angle: _angle, rotating }) => {
-          autoRotating.value = rotating as boolean
+        stopRotate: ({ rotating }) => {
+          autoRotating.value = rotating
           state.finish()
         },
       },
@@ -109,14 +109,14 @@ export function useTimeRange({ winResizeObserver, state, tomato }: Options) {
       circular: false,
       callbackCollection: {
         readyRotate: ({ rotating }) => {
-          dragRotating.value = rotating as boolean
+          dragRotating.value = rotating
           autoRotation2d.pauseTransition()
         },
         rotate: ({ flyingAngle }) => {
           angle.value = flyingAngle as number
         },
         stopRotate: ({ rotating, angle }) => {
-          dragRotating.value = rotating as boolean
+          dragRotating.value = rotating
 
           // if (angle === 0) {
           //   state.finish()
@@ -124,7 +124,7 @@ export function useTimeRange({ winResizeObserver, state, tomato }: Options) {
           // }
 
           if (!state.isPaused()) {
-            autoRotation2d.transitFromTo(angle as number, 0)
+            autoRotation2d.transitFromTo(angle, 0)
           }
         },
       },
@@ -168,7 +168,7 @@ export function useTimeRange({ winResizeObserver, state, tomato }: Options) {
     tomatoConsumeAutoRotation2d.value =
       createTomatoConsumeAutoRotation2d().addCallbacks({
         stopRotate({ angle: _angle }) {
-          angle.value = _angle as number
+          angle.value = _angle
           ;(autoRotation2d.value as AutoRotation2d).transitFromTo(
             angle.value,
             0
