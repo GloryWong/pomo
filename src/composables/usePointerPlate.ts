@@ -14,7 +14,7 @@ export function usePointerPlate({
   timeRange,
   tomato,
 }: Options) {
-  const pointerPlate = ref<unknown>(null)
+  const pointerPlateElRef = ref<unknown>(null)
   const data = reactive({
     size: 0,
     radius: 0,
@@ -28,7 +28,7 @@ export function usePointerPlate({
   onMounted(() => {
     winResizeObserver.register(() => {
       const { width } = (
-        pointerPlate.value as HTMLElement
+        pointerPlateElRef.value as HTMLElement
       ).getBoundingClientRect()
       data.size = width
       data.radius = width / 2
@@ -97,7 +97,7 @@ export function usePointerPlate({
   })
 
   return {
-    pointerPlate,
+    pointerPlateElRef,
     data,
   }
 }
