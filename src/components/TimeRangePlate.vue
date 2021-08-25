@@ -6,7 +6,6 @@
       w-full
       h-full
       rounded-full
-      absolute
       top-0
       right-0
       bottom-0
