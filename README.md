@@ -2,9 +2,11 @@
 <img src="screenshot.webp" width="300">
 </h1>
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/8d9b209a-2d24-40f4-a6a4-4f8f371aafe7/deploy-status)](https://app.netlify.com/sites/gloxy-pomo/deploys) [![npm dependents](https://badgen.net/npm/dependents/chalk)](https://www.npmjs.com/package/chalk?activeTab=dependents)
+
 # Pomo
 
-Pomo is an easy use PWA application, which implements the major features of the [Pomodoro Technique](https://en.wikipedia.org/wiki/Pomodoro_Technique) and can be used as a free countdown clock.
+[Pomo](https://gloxy-pomo.netlify.app/) is an easy use PWA application, which implements the major features of the [Pomodoro Technique](https://en.wikipedia.org/wiki/Pomodoro_Technique) and can be used as a free countdown clock.
 
 Compared with other similar pomodora applications, Pomo allows users to flexibly adjust the current time point while any 'tomato' or 'break' is running. That feature meets users' requirements of increasing or decreaing the running time as user need. Nevertheless, the clock-like plate around the center display simplifys the operations on adjusting time without using or callouting device keybord.
 
@@ -26,9 +28,9 @@ Compared with other similar pomodora applications, Pomo allows users to flexibly
 
 ## Commit
 
-1. Fork it (<https://github.com/sr6033/lterm/fork>)
+1. Fork it (<https://github.com/GloryWong/pomo.git>)
 2. Create your feature branch (`git checkout -b feature/fooBar`)
-3. Commit your changes (`git commit -am 'Add some fooBar'`)
+3. Commit your changes (`git commit -am 'feat: Add some fooBar'`)
 4. Push to the branch (`git push origin feature/fooBar`)
 5. Create a new Pull Request
 
@@ -47,6 +49,6 @@ This project mainly use the Vue3 feature `<script setup>`. To get proper IDE sup
 
 ## Q & A
 
-- Q: Unknow at rule of `@tailwind`
+- Q: Unknown `at rule` of `@tailwind`
 
   A: [Check here](https://stackoverflow.com/questions/47607602/how-to-add-a-tailwind-css-rule-to-css-checker)
