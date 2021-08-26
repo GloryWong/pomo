@@ -26,10 +26,10 @@
           `${primary ? 'w-1/100' : 'w-1/200'}`,
           `${primary ? 'h-1/24' : 'h-1/48'}`,
           `${
-            minute <= timeRangeTime
-              ? 'bg-yellow-300'
-              : minute === SINGLE_DURATION
-              ? 'bg-secondary-light'
+            minute <= timeRangeTime && minute !== 0
+              ? 'bg-secondary'
+              : minute === SINGLE_DURATION && state.isCool()
+              ? 'bg-secondary-dark'
               : 'bg-neutral'
           }`,
         ]"
@@ -53,10 +53,10 @@
           "
           :class="[
             `${
-              minute <= timeRangeTime
-                ? 'text-yellow-300'
-                : minute === SINGLE_DURATION
-                ? 'text-secondary-light'
+              minute <= timeRangeTime && minute !== 0
+                ? 'text-secondary'
+                : minute === SINGLE_DURATION && state.isCool()
+                ? 'text-secondary-dark'
                 : 'text-neutral'
             }`,
           ]"
@@ -75,12 +75,13 @@
 
 <script lang="ts" setup>
   import { inject } from 'vue'
-  import { TimeRange, Tomato } from '../composables'
+  import { State, TimeRange, Tomato } from '../composables'
 
   const { timeRange } = defineProps<{
     timeRange: TimeRange
   }>()
   const tomato = inject('tomato') as Tomato
+  const state = inject('state') as State
 
   const {
     timeRangeElRef,

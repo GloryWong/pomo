@@ -32,9 +32,11 @@ module.exports = {
           dark: '#972118',
         },
         secondary: {
-          light: '#9FD547',
-          DEFAULT: '#81B037',
-          dark: '#4F6E1E',
+          lighter: colors.amber[50],
+          light: colors.amber[100],
+          DEFAULT: colors.amber[200],
+          dark: colors.amber[300],
+          darker: colors.amber[400],
         },
         neutral: {
           lighter: colors.gray[50],
@@ -50,6 +52,8 @@ module.exports = {
           0 0 10px 1px rgba(0,0,0,0.15),
           inset 0 0 8px 5px rgba(255,255,255,0.1),
           inset 0 0 10px 0px rgba(0,0,0,0.15)`,
+        'tomato-border':
+          '0 0px 15px 0px rgba(0, 0, 0, 0.1), 0 0px 6px 0px rgba(0, 0, 0, 0.05)',
       },
       backgroundImage: {
         'tomato-radial-gradient': `

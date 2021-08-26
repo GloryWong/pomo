@@ -1,6 +1,8 @@
 <template>
-  <ControlPanel />
-  <DialPlate />
+  <div class="flex justify-center items-center bg-primary w-screen h-screen">
+    <ControlPanel />
+    <DialPlate />
+  </div>
 </template>
 
 <script lang="ts" setup>
@@ -25,10 +27,5 @@
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: #2c3e50;
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
   }
 </style>

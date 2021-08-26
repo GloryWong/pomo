@@ -67,29 +67,29 @@ export function usePointerPlate({
     state.core
     if (tomato.springQueueRunning.value) {
       if (tomato.activeSpring.value) {
-        description = 'Tomato Consuming'
-        state.isPaused() && (description = 'Tomato Paused')
+        description = 'Focus Time'
+        state.isPaused() && (description = 'Focus Paused')
 
         if (tomato.isActiveShortBreakSpring()) {
           description = 'Short Break'
-          state.isPaused() && (description = 'Short Break Paused')
+          state.isPaused() && (description = 'Break Paused')
         }
         if (tomato.isActiveLongBreakSpring()) {
           description = 'Long Break'
-          state.isPaused() && (description = 'Long Break Paused')
+          state.isPaused() && (description = 'Break Paused')
         }
 
-        timeRange.dragRotating.value && (description = 'Time Adjusting')
+        timeRange.dragRotating.value && (description = 'Time Adjust')
       }
     } else {
       if (timeRange.dragRotating.value) {
-        description = 'Time Selecting'
+        description = 'Time Select'
       }
       if (state.isRunning()) {
-        description = 'Double Click To Pause'
+        description = 'Countdown'
       }
       if (state.isPaused()) {
-        description = 'Double Click To Resume'
+        description = 'Paused'
       }
     }
 

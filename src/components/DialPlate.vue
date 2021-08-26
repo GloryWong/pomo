@@ -9,6 +9,7 @@
       overflow-hidden
       relative
       bg-tomato-radial-gradient
+      shadow-tomato-border
     "
     :style="`width: ${dialPlateSize}px; height: ${dialPlateSize}px;`"
   >

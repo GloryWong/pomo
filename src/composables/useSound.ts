@@ -54,7 +54,7 @@ export function useSound({ timeRange, state }: Options) {
 
   watch(state.core, () => {
     if (state.isFinished()) {
-      playEndSound()
+      playHintSound()
     }
   })
 }
