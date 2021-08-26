@@ -2,7 +2,7 @@
 <img src="screenshot.webp" width="300">
 </h1>
 
-[![pomo address](https://badgen.net/Pomo/official/D6442A)](https://pomo.zhaozhao.today) [![Netlify Status](https://api.netlify.com/api/v1/badges/8d9b209a-2d24-40f4-a6a4-4f8f371aafe7/deploy-status)](https://app.netlify.com/sites/gloxy-pomo/deploys) ![latest tag](https://badgen.net/github/tag/GloryWong/pomo) ![license](https://badgen.net/license/MIT/blue)
+[![pomo address](https://img.shields.io/badge/Pomo-Official-D6442A)](https://pomo.zhaozhao.today) [![Netlify Status](https://api.netlify.com/api/v1/badges/8d9b209a-2d24-40f4-a6a4-4f8f371aafe7/deploy-status)](https://app.netlify.com/sites/gloxy-pomo/deploys) ![Latest Tag](https://badgen.net/github/tag/GloryWong/pomo) ![License](https://img.shields.io/github/license/GloryWong/pomo)
 
 # Pomo
 
