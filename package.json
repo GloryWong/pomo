@@ -9,6 +9,8 @@
     "preview:https": "npm run build && serve dist"
   },
   "dependencies": {
+    "@gloxy/rotation2d-auto": "^0.0.3",
+    "@gloxy/rotation2d-drag": "^0.0.3-alpha.0",
     "number-precision": "^1.5.1",
     "tone": "^14.7.77",
     "vue": "^3.0.5"

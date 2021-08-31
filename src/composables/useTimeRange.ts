@@ -14,8 +14,8 @@ import {
   minuteToAngle,
   secondToAngle,
 } from '../shared/util'
-import { DragRotation2d } from '../shared/DragRotation2d'
-import { AutoRotation2d } from '../shared/AutoRotation2d'
+import { DragRotation2d } from '@gloxy/rotation2d-drag'
+import { AutoRotation2d } from '@gloxy/rotation2d-auto'
 import { WinResizeObserver, State, Tomato } from '.'
 
 export type ClientPos = {
@@ -88,14 +88,14 @@ export function useTimeRange({ winResizeObserver, state, tomato }: Options) {
       stepAngle: secondToAngle(1, unitAngle.value),
       callbackCollection: {
         readyRotate: ({ rotating }) => {
-          autoRotating.value = rotating
+          autoRotating.value = rotating as boolean
           state.run()
         },
         rotate: ({ angle: _angle }) => {
-          angle.value = _angle
+          angle.value = _angle as number
         },
         stopRotate: ({ rotating }) => {
-          autoRotating.value = rotating
+          autoRotating.value = rotating as boolean
           state.finish()
         },
       },
@@ -109,14 +109,14 @@ export function useTimeRange({ winResizeObserver, state, tomato }: Options) {
       circular: false,
       callbackCollection: {
         readyRotate: ({ rotating }) => {
-          dragRotating.value = rotating
+          dragRotating.value = rotating as boolean
           autoRotation2d.pauseTransition()
         },
         rotate: ({ flyingAngle }) => {
           angle.value = flyingAngle as number
         },
         stopRotate: ({ rotating, angle }) => {
-          dragRotating.value = rotating
+          dragRotating.value = rotating as boolean
 
           // if (angle === 0) {
           //   state.finish()
@@ -124,7 +124,7 @@ export function useTimeRange({ winResizeObserver, state, tomato }: Options) {
           // }
 
           if (!state.isPaused()) {
-            autoRotation2d.transitFromTo(angle, 0)
+            autoRotation2d.transitFromTo(angle as number, 0)
           }
         },
       },
@@ -167,8 +167,8 @@ export function useTimeRange({ winResizeObserver, state, tomato }: Options) {
     // Tomato consume AutoRotation2d
     tomatoConsumeAutoRotation2d.value =
       createTomatoConsumeAutoRotation2d().addCallbacks({
-        stopRotate({ angle: _angle }) {
-          angle.value = _angle
+        stopRotate: ({ angle: _angle }) => {
+          angle.value = _angle as number
           ;(autoRotation2d.value as AutoRotation2d).transitFromTo(
             angle.value,
             0
