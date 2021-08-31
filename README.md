@@ -8,11 +8,11 @@
 
 [Pomo](https://pomo.zhaozhao.today/) is an easy use PWA application, which implements the major features of the [Pomodoro Technique](https://en.wikipedia.org/wiki/Pomodoro_Technique) and can be used as a free countdown clock.
 
-Compared with other similar pomodora applications, Pomo allows users to flexibly adjust the current time point while any 'tomato' or 'break' is running. That feature meets users' requirements of increasing or decreaing the running time as user need. Nevertheless, the clock-like plate around the center display simplifys the operations on adjusting time without using or callouting device keybord.
+Compared with other similar pomodora applications, Pomo allows users to flexibly adjust the current time point while any 'tomato' or 'break' is running. That feature meets users' requirements of increasing or decreaing the running time as users need. Nevertheless, the clock-like plate around the central display simplifys operations on adjusting time without using or callouting device keyboard.
 
 ## Two modes
 
-- Pomodoro: start a pomodoro cycle from tapping center display area.
+- Pomodoro: start a pomodoro cycle from tapping central display area.
 - Countdown: rotate the clock-like plate to set a countdown and it starts automatically soon after the time is set.
 
 ---
